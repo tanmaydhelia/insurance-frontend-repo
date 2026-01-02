@@ -11,19 +11,16 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 
-  // Auth Module (Public)
   {
     path: 'auth',
     loadChildren: () => import('./modules/auth/auth-module').then(m => m.AuthModule)
   },
 
-  // Unauthorized Page
   {
     path: 'unauthorized',
     component: UnauthorizedComponent
   },
   
-  // Protected Routes with Guards
   {
     path: 'member',
     loadChildren: () => import('./modules/member/member-module').then(m => m.MemberModule),
@@ -45,7 +42,6 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard([ERole.ROLE_PROVIDER])]
   },
 
-  // Fallback Route (404)
   {
     path: '**',
     redirectTo: 'auth/login'
