@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { audit, BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ERole, IAuthRequest, IChangePasswordRequest, IUser } from '../../models/user.model';
 import { Api } from '../api/api';
 import { Router } from '@angular/router';

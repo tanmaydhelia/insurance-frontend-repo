@@ -1,0 +1,52 @@
+<form [formGroup]="registerForm" (ngSubmit)="submit()" class="space-y-6">
+      
+      <div>
+        <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Full Name</label>
+        <div class="mt-2">
+          <input id="name" type="text" formControlName="name" 
+                 [class.ring-red-500]="isInvalid('name')"
+                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+        <p *ngIf="isInvalid('name')" class="mt-1 text-sm text-red-600">
+          {{ getErrorMessage('name') }}
+        </p>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
+        <div class="mt-2">
+          <input id="email" type="email" formControlName="email"
+                 [class.ring-red-500]="isInvalid('email')"
+                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+        <p *ngIf="isInvalid('email')" class="mt-1 text-sm text-red-600">
+          {{ getErrorMessage('email') }}
+        </p>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+        <div class="mt-2">
+          <input id="password" type="password" formControlName="password"
+                 [class.ring-red-500]="isInvalid('password')"
+                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+        <p *ngIf="isInvalid('password')" class="mt-1 text-sm text-red-600">
+          {{ getErrorMessage('password') }}
+        </p>
+      </div>
+
+      <div>
+        <button type="submit" 
+                [disabled]="registerForm.invalid || isLoading"
+                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50">
+          <i *ngIf="isLoading" class="pi pi-spin pi-spinner mr-2"></i>
+          Register
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-10 text-center text-sm text-gray-500">
+      Already a member?
+      <a routerLink="/auth/login" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign in</a>
+    </p>
