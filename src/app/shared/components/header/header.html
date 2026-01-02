@@ -57,6 +57,26 @@
             </a>
           </li>
         </ng-container>
+
+        <ng-container *appHasRole="['ROLE_PROVIDER']">
+          <li>
+            <a routerLink="/provider/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Provider Portal
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *appHasRole="['ROLE_CLAIMS_OFFICER']">
+          <li>
+            <a routerLink="/claims/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Claims Portal
+            </a>
+          </li>
+        </ng-container>
       }
     </ul>
 

@@ -41,6 +41,12 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/provider/provider-module').then(m => m.ProviderModule),
     canActivate: [authGuard, roleGuard([ERole.ROLE_PROVIDER])]
   },
+  // Claims Officer Module (Uncomment when module is created)
+  // {
+  //   path: 'claims',
+  //   loadChildren: () => import('./modules/claims/claims-module').then(m => m.ClaimsModule),
+  //   canActivate: [authGuard, roleGuard([ERole.ROLE_CLAIMS_OFFICER])]
+  // },
 
   {
     path: '**',
