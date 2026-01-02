@@ -1,0 +1,46 @@
+<section class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">My Dashboard</h1>
+      <p class="text-gray-500 mt-1">Manage your active insurance policies and claims.</p>
+    </div>
+    <a
+      routerLink="/public/search"
+      class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+    >
+      <i class="pi pi-plus mr-2"></i>
+      Buy New Policy
+    </a>
+  </div>
+
+  <div class="mt-8">
+    @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
+    </div>
+    } @else if (policies().length === 0) {
+    <div class="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+      <div class="mx-auto h-12 w-12 text-gray-400">
+        <i class="pi pi-folder-open text-4xl"></i>
+      </div>
+      <h3 class="mt-2 text-sm font-semibold text-gray-900">No policies found</h3>
+      <p class="mt-1 text-sm text-gray-500">You haven't purchased any insurance plans yet.</p>
+      <div class="mt-6">
+        <a routerLink="/public/search" class="text-blue-600 hover:text-blue-500 font-medium">
+          Browse Available Plans &rarr;
+        </a>
+      </div>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (policy of policies(); track policy.id) {
+      <app-policy-card
+        [policy]="policy"
+        (onClaim)="handleRaiseClaim($event)"
+        (onDownload)="handleDownload($event)"
+      />
+      }
+    </div>
+    }
+  </div>
+</section>
