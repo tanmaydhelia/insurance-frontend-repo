@@ -1,8 +1,37 @@
 import { Injectable } from '@angular/core';
+import { Api } from '../api/api';
+import { IClaim, IClaimRequest, IClaimStatusUpdate } from '../../models/claim.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Claim {
-  
+  private BASE_PATH = '/claims';
+
+  constructor(private api: Api) {}
+
+  submitClaim(request: IClaimRequest): Observable<IClaim> {
+    return this.api.post<IClaim>(`${this.BASE_PATH}/submit`, request);
+  }
+
+  getClaimById(id: number): Observable<IClaim> {
+    return this.api.get<IClaim>(`${this.BASE_PATH}/${id}`);
+  }
+
+  getMemberClaims(userId: number): Observable<IClaim[]> {
+    return this.api.get<IClaim[]>(`${this.BASE_PATH}/member/${userId}`);
+  }
+
+  getProviderClaims(hospitalId: number): Observable<IClaim[]> {
+    return this.api.get<IClaim[]>(`${this.BASE_PATH}/provider/${hospitalId}`);
+  }
+
+  getOpenClaims(): Observable<IClaim[]> {
+    return this.api.get<IClaim[]>(`${this.BASE_PATH}/open`);
+  }
+
+  updateClaimStatus(id: number, statusDto: IClaimStatusUpdate): Observable<IClaim> {
+    return this.api.put<IClaim>(`${this.BASE_PATH}/${id}/status`, statusDto);
+  }
 }

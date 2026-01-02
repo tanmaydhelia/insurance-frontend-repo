@@ -11,23 +11,27 @@ export class Api {
 
   constructor(private http: HttpClient) {}
 
-  // Generic GET
   get<T>(path: string, params: HttpParams = new HttpParams()): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}${path}`, { params });
   }
 
-  // Generic POST
   post<T>(path: string, body: Object = {}): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}${path}`, body);
   }
 
-  // Generic PUT
   put<T>(path: string, body: Object = {}): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body);
   }
 
-  // Generic DELETE
   delete<T>(path: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}${path}`);
+  }
+
+  postText(path: string, body: Object = {}): Observable<string> {
+    return this.http.post(`${this.baseUrl}${path}`, body, { responseType: 'text' });
+  }
+  
+  putText(path: string, body: Object = {}): Observable<string> {
+    return this.http.put(`${this.baseUrl}${path}`, body, { responseType: 'text' });
   }
 }
