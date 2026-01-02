@@ -10,10 +10,10 @@ export enum SubmissionSource {
   PROVIDER = 'PROVIDER'
 }
 
-export interface Claim {
+export interface IClaim {
   id: number;
   policyId: number;
-  hospitalId?: number;
+  hospitalId?: number; 
   diagnosis: string;
   claimAmount: number;
   status: ClaimStatus;
@@ -22,15 +22,16 @@ export interface Claim {
   date: string;
 }
 
-export interface ClaimRequest {
+
+export interface IClaimRequest {
   policyId: number;
-  hospitalId?: number; 
   diagnosis: string;
   claimAmount: number;
+  hospitalId?: number;
   submissionSource: SubmissionSource;
 }
 
-export interface ClaimStatusUpdate {
+export interface IClaimStatusUpdate {
   status: ClaimStatus;
   rejectionReason?: string;
 }

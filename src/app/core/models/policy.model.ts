@@ -1,24 +1,37 @@
-export interface InsurancePlan {
-  planId: number;
-  planName: string;
-  planType: string;
-  basePremium: number;
-  totalCoverage: number;
-  description: string;
+export enum PolicyStatus {
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED'
 }
 
-export interface Policy {
+export interface IInsurancePlan {
+  id?: number;
+  name: string;
+  description: string;
+  basePremium: number;
+  coverageAmount: number;
+}
+
+export interface IPolicy {
   id: number;
-  userId: number;
-  agentId?: number;
-  insurancePlan: InsurancePlan;
+  policyNumber: string;
   startDate: string; 
   endDate: string;
   premium: number;
-  status: 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
+  status: PolicyStatus;
+  userId: number;
+  agentId?: number; 
+  insurancePlan: IInsurancePlan; 
 }
 
-export interface PolicyEnrollmentRequest {
+export interface IPlanRequest {
+  name: string;
+  description: string;
+  basePremium: number;
+  coverageAmount: number;
+}
+
+export interface IPolicyEnrollmentRequest {
   userId: number;
   planId: number;
   agentId?: number;
