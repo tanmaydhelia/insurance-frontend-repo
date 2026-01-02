@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { audit, BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ERole, IAuthRequest, IChangePasswordRequest, IUser } from '../../models/user.model';
 import { Api } from '../api/api';
 import { Router } from '@angular/router';
@@ -55,6 +55,23 @@ export class Auth {
     return this.userSubject.value?.id;
   }
 
+  getUsername(): string | undefined {
+    // Return the actual username field (decoded from JWT 'sub')
+    const username = this.userSubject.value?.username;
+    console.log('getUsername() called, returning:', username);
+    console.log('Current user value:', this.userSubject.value);
+    return username;
+  }
+
+  getUserName(): string | undefined {
+    // Return the actual display name
+    return this.userSubject.value?.name;
+  }
+
+  getUserEmail(): string | undefined {
+    return this.userSubject.value?.email;
+  }
+
   private loadUserFromToken() {
     const token = this.getToken();
     if (token) this.decodeAndSetUser(token);
@@ -64,12 +81,30 @@ export class Auth {
     try {
       const decoded: any = jwtDecode(token);
       
+      console.log('Decoded JWT token:', decoded);
+      console.log('decoded.sub:', decoded.sub);
+      console.log('decoded.username:', decoded.username);
+      console.log('decoded.email:', decoded.email);
+      
+      const username = decoded.sub || decoded.username || decoded.email;
+      const displayName = decoded.name || username;
+      
+      console.log('Extracted username:', username);
+      
+      if (!username) {
+        console.error('No username found in JWT token!');
+        throw new Error('Invalid token: no username found');
+      }
+      
       this.userSubject.next({
-        name: decoded.sub, 
+        username: username,           
+        name: displayName,            
         email: decoded.email, 
         role: decoded.roles,
         id: decoded.userId 
       });
+      
+      console.log('User set in userSubject:', this.userSubject.value);
     } catch (error) {
       console.error('Invalid Token', error);
       this.logout();

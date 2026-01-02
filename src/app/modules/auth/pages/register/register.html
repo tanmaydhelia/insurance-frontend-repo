@@ -1,0 +1,47 @@
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <i class="pi pi-shield mx-auto h-10 w-auto text-4xl text-indigo-600 text-center block"></i>
+        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          Sign up for an account
+        </h2>
+      </div>
+
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="mb-4 rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="shrink-0">
+              <i class="pi pi-times-circle text-red-400"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>{{ errorMessage }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="mb-4 rounded-md bg-green-50 p-4">
+          <div class="flex">
+            <div class="shrink-0">
+              <i class="pi pi-check-circle text-green-400"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-green-800">Success!</h3>
+              <div class="mt-2 text-sm text-green-700">
+                <p>{{ successMessage }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <app-register-form 
+          [isLoading]="isLoading" 
+          (onSubmit)="handleRegister($event)">
+        </app-register-form>
+      </div>
+    </div>

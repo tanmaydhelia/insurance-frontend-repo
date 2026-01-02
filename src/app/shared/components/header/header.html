@@ -1,0 +1,104 @@
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <nav class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center" role="navigation">
+    
+    <div class="shrink-0">
+      <a routerLink="/" class="flex items-center gap-2 group">
+        <i class="pi pi-shield text-2xl text-blue-600 group-hover:text-blue-700 transition-colors"></i>
+        <span class="text-xl font-bold tracking-tight text-gray-900 group-hover:text-blue-700 transition-colors">
+          InsuranceApp
+        </span>
+      </a>
+    </div>
+
+    <ul class="hidden md:flex items-center gap-8">
+      <li>
+        <a routerLink="/" 
+           routerLinkActive="text-blue-600 font-semibold" 
+           [routerLinkActiveOptions]="{exact: true}"
+           class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+           Home
+        </a>
+      </li>
+      <li>
+        <a routerLink="/search" 
+           routerLinkActive="text-blue-600 font-semibold"
+           class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+           Find Hospital
+        </a>
+      </li>
+
+      @if (user$ | async; as user) {
+        <ng-container *appHasRole="['ROLE_USER']">
+          <li>
+            <a routerLink="/member/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               My Dashboard
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *appHasRole="['ROLE_ADMIN']">
+          <li>
+            <a routerLink="/admin/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Admin Panel
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *appHasRole="['ROLE_AGENT']">
+          <li>
+            <a routerLink="/agent/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Agent Portal
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *appHasRole="['ROLE_PROVIDER']">
+          <li>
+            <a routerLink="/provider/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Provider Portal
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *appHasRole="['ROLE_CLAIMS_OFFICER']">
+          <li>
+            <a routerLink="/claims/dashboard" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Claims Portal
+            </a>
+          </li>
+        </ng-container>
+      }
+    </ul>
+
+    <div class="flex items-center gap-4">
+      @if (user$ | async; as user) {
+        <span class="text-sm font-semibold text-gray-700 hidden sm:block">
+          Hi, {{ user.name }}
+        </span>
+        <button (click)="logout()" 
+                class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-100">
+          Logout
+        </button>
+      } @else {
+        <a routerLink="/auth/login" 
+           class="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+           Login
+        </a>
+        <a routerLink="/auth/register" 
+           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all hover:shadow-md">
+           Get Insured
+        </a>
+      }
+    </div>
+  </nav>
+</header>
