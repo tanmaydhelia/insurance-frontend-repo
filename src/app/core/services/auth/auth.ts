@@ -56,18 +56,8 @@ export class Auth {
   }
 
   getUsername(): string | undefined {
-    // Return the actual username field (decoded from JWT 'sub')
-    const username = this.userSubject.value?.username;
-    console.log('getUsername() called, returning:', username);
-    console.log('Current user value:', this.userSubject.value);
-    return username;
+    return this.userSubject.value?.username;
   }
-
-  getUserName(): string | undefined {
-    // Return the actual display name
-    return this.userSubject.value?.name;
-  }
-
   getUserEmail(): string | undefined {
     return this.userSubject.value?.email;
   }

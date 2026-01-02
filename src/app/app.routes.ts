@@ -20,6 +20,11 @@ export const routes: Routes = [
     path: 'unauthorized',
     component: UnauthorizedComponent
   },
+
+  {
+    path: 'public',
+    loadChildren: () => import('./modules/public/public-module').then(m => m.PublicModule)
+  },
   
   {
     path: 'member',
