@@ -24,8 +24,9 @@ export const routes: Routes = [
   {
     path: 'member',
     loadChildren: () => import('./modules/member/member-module').then(m => m.MemberModule),
-    canActivate: [authGuard, roleGuard([ERole.ROLE_USER])]
-  },
+    canActivate: [authGuard, roleGuard([ERole.ROLE_USER])],
+    data: { roles: [ERole.ROLE_USER] }
+  },  
   {
     path: 'admin',
     loadChildren: () => import('./modules/admin/admin-module').then(m => m.AdminModule),
