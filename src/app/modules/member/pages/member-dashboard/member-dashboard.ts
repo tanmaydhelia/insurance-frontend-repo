@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { PolicyCard } from '../../container/policy-card/policy-card';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Policy } from '../../../../core/services/policy/policy';
 import { Auth } from '../../../../core/services/auth/auth';
 import { of, switchMap } from 'rxjs';
@@ -18,6 +18,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class MemberDashboard{
   private policyService = inject(Policy);
   private authService = inject(Auth);
+  private router = inject(Router);
 
   private userSignal = toSignal(this.authService.user$);
 
@@ -40,7 +41,7 @@ export class MemberDashboard{
   });
 
   handleRaiseClaim(policyId: number) {
-    console.log('Claim initiated for policy:', policyId);
+    this.router.navigate(['/member/claim/new', policyId]);
   }
 
   handleDownload(policyId: number) {

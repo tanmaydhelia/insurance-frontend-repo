@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { MemberRoutingModule } from './member-routing-module';
 import { MemberDashboard } from './pages/member-dashboard/member-dashboard';
+import { RaiseClaims } from './pages/raise-claims/raise-claims';
 
 
 @NgModule({
@@ -10,7 +11,8 @@ import { MemberDashboard } from './pages/member-dashboard/member-dashboard';
   imports: [
     CommonModule,
     MemberRoutingModule,
-    MemberDashboard
+    MemberDashboard,
+    RaiseClaims
   ]
 })
 export class MemberModule { }

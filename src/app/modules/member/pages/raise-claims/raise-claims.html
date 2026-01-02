@@ -1,0 +1,41 @@
+<div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">File a Claim</h1>
+    <p class="text-gray-500 mt-1">Submit your medical expenses for reimbursement.</p>
+  </div>
+
+  @if (policy(); as pol) {
+  <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded-r-md">
+    <div class="flex">
+      <div class="shrink-0">
+        <i class="pi pi-info-circle text-blue-500 text-xl"></i>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">
+          Claiming against Policy #{{ pol.policyNumber }}
+        </h3>
+        <div class="mt-2 text-sm text-blue-700">
+          <p>
+            Plan: <span class="font-semibold">{{ pol.plan?.name }}</span>
+          </p>
+          <p>
+            Coverage Limit:
+            <span class="font-semibold">{{
+              pol.plan?.coverageAmount | currency : 'INR'
+            }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <div class="bg-white shadow rounded-lg px-6 py-6 border border-gray-200">
+    <app-claim-form
+      [isLoading]="isSubmitting"
+      (onSubmit)="handleSubmit($event)"
+      (onCancel)="handleCancel()"
+    >
+    </app-claim-form>
+  </div>
+</div>
