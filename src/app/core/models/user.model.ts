@@ -5,14 +5,21 @@ export enum ERole {
   ROLE_AGENT = 'ROLE_AGENT'
 }
 
-export interface User {
-  id: number;
+export interface IUser {
+  id?: number;
   name: string;
   email: string;
+  password?: string; 
   role: ERole;
-  token?: string;
 }
 
-export interface AuthResponse {
-  token: string;
+export interface IAuthRequest {
+  username: string;
+  password: string;
+}
+
+export interface IChangePasswordRequest {
+  username: string;
+  oldPassword: string;
+  newPassword: string;
 }
