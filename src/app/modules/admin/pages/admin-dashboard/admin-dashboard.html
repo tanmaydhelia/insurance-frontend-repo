@@ -1,0 +1,84 @@
+<div class="min-h-screen bg-gray-50 py-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+      <div class="min-w-0 flex-1">
+        <h2
+          class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+        >
+          Product Management
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Manage insurance plans and products.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1">
+        <div
+          class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 sticky top-6"
+        >
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4 flex items-center">
+              <i class="pi pi-plus-circle mr-2 text-indigo-600"></i>
+              Add New Plan
+            </h3>
+            <app-plan-form (onSubmit)="handleCreate($event)"> </app-plan-form>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gray-50/50">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-medium leading-6 text-gray-900">Active Plans Portfolio</h3>
+              <span
+                class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10"
+              >
+                {{ plans()?.length || 0 }} Plans
+              </span>
+            </div>
+          </div>
+
+          <ul role="list" class="divide-y divide-gray-200">
+            @for (plan of plans(); track plan.id) {
+            <li class="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors group">
+              <div class="flex items-center justify-between">
+                <div class="truncate flex-1">
+                  <div class="flex text-sm">
+                    <p class="font-bold text-indigo-600 truncate text-base">{{ plan.name }}</p>
+                  </div>
+                  <div class="mt-1 flex">
+                    <p class="text-sm text-gray-500 line-clamp-2">{{ plan.description }}</p>
+                  </div>
+                  <div class="mt-2 flex items-center text-xs text-gray-400">
+                    <span class="flex items-center mr-4">
+                      <i class="pi pi-shield mr-1"></i> Cover:
+                      {{ plan.coverageAmount | currency : 'INR' : 'symbol' : '1.0-0' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="ml-4 flex shrink-0 flex-col text-right items-end gap-2">
+                  <span
+                    class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
+                  >
+                    Active
+                  </span>
+                  <p class="text-lg text-gray-900 font-bold">
+                    {{ plan.basePremium | currency : 'INR' : 'symbol' : '1.0-0'
+                    }}<span class="text-xs font-normal text-gray-500">/yr</span>
+                  </p>
+                </div>
+              </div>
+            </li>
+            } @empty {
+            <li class="px-4 py-12 text-center text-gray-500 text-sm flex flex-col items-center">
+              <i class="pi pi-box text-4xl text-gray-300 mb-3"></i>
+              No plans found. Create your first plan on the left.
+            </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

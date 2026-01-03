@@ -1,0 +1,68 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+      
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Plan Name</label>
+        <div class="mt-1">
+          <input type="text" id="name" formControlName="name" 
+                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                 placeholder="e.g. Platinum Health Shield">
+        </div>
+        @if (isInvalid('name')) {
+          <p class="mt-1 text-xs text-red-600">Plan name is required (min 3 chars).</p>
+        }
+      </div>
+
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <div class="mt-1">
+          <textarea id="description" formControlName="description" rows="3"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                    placeholder="Key benefits and features..."></textarea>
+        </div>
+        @if (isInvalid('description')) {
+          <p class="mt-1 text-xs text-red-600">Description is required.</p>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+        <div>
+          <label for="basePremium" class="block text-sm font-medium text-gray-700">Annual Premium (₹)</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="text-gray-500 sm:text-sm">₹</span>
+            </div>
+            <input type="number" id="basePremium" formControlName="basePremium"
+                   class="block w-full rounded-md border-gray-300 pl-7 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                   placeholder="0.00">
+          </div>
+          @if (isInvalid('basePremium')) {
+            <p class="mt-1 text-xs text-red-600">Valid premium required.</p>
+          }
+        </div>
+
+        <div>
+          <label for="coverageAmount" class="block text-sm font-medium text-gray-700">Coverage Limit (₹)</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="text-gray-500 sm:text-sm">₹</span>
+            </div>
+            <input type="number" id="coverageAmount" formControlName="coverageAmount"
+                   class="block w-full rounded-md border-gray-300 pl-7 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                   placeholder="0.00">
+          </div>
+          @if (isInvalid('coverageAmount')) {
+            <p class="mt-1 text-xs text-red-600">Valid coverage required.</p>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4 border-t border-gray-100">
+        <button type="submit" 
+                [disabled]="form.invalid || isLoading()"
+                class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+          @if (isLoading()) { <i class="pi pi-spin pi-spinner mr-2"></i> }
+          Create Plan
+        </button>
+      </div>
+
+    </form>
