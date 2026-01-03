@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ClaimForm } from '../../container/claim-form/claim-form';
 import { Policy } from '../../../../core/services/policy/policy';
 import { Claim } from '../../../../core/services/claim/claim';
 import { map, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IClaimRequest, SubmissionSource } from '../../../../core/models/claim.model';
+import { ClaimForm } from '../../../../shared/components/claim-form/claim-form';
 
 @Component({
   selector: 'app-raise-claims',

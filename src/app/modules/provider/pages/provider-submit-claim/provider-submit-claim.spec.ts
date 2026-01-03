@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClaimForm } from './claim-form';
+import { ProviderSubmitClaim } from './provider-submit-claim';
 
-describe('ClaimForm', () => {
-  let component: ClaimForm;
-  let fixture: ComponentFixture<ClaimForm>;
+describe('ProviderSubmitClaim', () => {
+  let component: ProviderSubmitClaim;
+  let fixture: ComponentFixture<ProviderSubmitClaim>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClaimForm]
+      imports: [ProviderSubmitClaim]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ClaimForm);
+    fixture = TestBed.createComponent(ProviderSubmitClaim);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
