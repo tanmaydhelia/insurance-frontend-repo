@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-gray-50 pb-12">
+  <div class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="md:flex md:items-center md:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2
+            class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+          >
+            Claims Adjudication
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">Review pending claims and manage payouts.</p>
+        </div>
+        <div class="mt-4 flex md:ml-4 md:mt-0">
+          <button
+            (click)="refresh()"
+            type="button"
+            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+          >
+            <i class="pi pi-refresh mr-2"></i>
+            Refresh Queue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div
+        class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-gray-100"
+      >
+        <dt class="truncate text-sm font-medium text-gray-500">Pending Review</dt>
+        <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          {{ claims()?.length || 0 }}
+        </dd>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center gap-4">
+        <i class="pi pi-spin pi-spinner text-4xl text-indigo-600"></i>
+        <p class="text-gray-500 font-medium">Loading claims queue...</p>
+      </div>
+    </div>
+    } @else {
+    <app-claims-table
+      [claims]="claims() || []"
+      (onApprove)="handleApprove($event)"
+      (onReject)="handleReject($event)"
+    >
+    </app-claims-table>
+    }
+  </main>
+</div>
