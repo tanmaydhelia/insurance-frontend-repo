@@ -46,8 +46,11 @@
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
           #{{ claim.id }}
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          Policy #{{ claim.policyId }}
+        <td class="px-6 py-4 text-sm text-gray-500">
+          <div class="flex flex-col">
+            <span class="font-medium text-gray-900">{{ getPolicyNumber(claim.policyId) }} </span>
+            <span class="text-xs text-gray-500">{{ getPlanName(claim.policyId) }}</span>
+          </div>
         </td>
         <td
           class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate"
