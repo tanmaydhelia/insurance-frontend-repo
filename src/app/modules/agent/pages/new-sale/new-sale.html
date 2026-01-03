@@ -1,0 +1,59 @@
+<div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">New Policy Sale</h1>
+    <p class="text-gray-600 mt-2">Enter customer email and select an insurance plan to enroll.</p>
+  </div>
+
+  <!-- Customer Email Input -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
+    
+    <div class="space-y-4">
+      <div>
+        <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-2">
+          Customer Email Address
+        </label>
+        <input
+          type="email"
+          id="customerEmail"
+          [value]="customerEmail()"
+          (input)="customerEmail.set($any($event.target).value); errorMessage.set(null)"
+          placeholder="customer@example.com"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        />
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage()) {
+      <div class="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <i class="pi pi-exclamation-circle text-red-600"></i>
+        <p class="text-sm text-red-700">{{ errorMessage() }}</p>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Available Plans -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Select Insurance Plan</h2>
+    
+    @if (plans(); as planList) {
+      @if (planList.length > 0) {
+        <app-agent-plan-table 
+          [plans]="planList" 
+          (onSelect)="handlePlanSelection($event)">
+        </app-agent-plan-table>
+      } @else {
+        <div class="text-center py-12">
+          <i class="pi pi-inbox text-4xl text-gray-400 mb-3"></i>
+          <p class="text-gray-500">No insurance plans available.</p>
+        </div>
+      }
+    } @else {
+      <div class="flex justify-center items-center py-12">
+        <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
+      </div>
+    }
+  </div>
+</div>

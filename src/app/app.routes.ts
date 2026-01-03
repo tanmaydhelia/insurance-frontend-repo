@@ -40,7 +40,8 @@ export const routes: Routes = [
   {
     path: 'agent',
     loadChildren: () => import('./modules/agent/agent-module').then(m => m.AgentModule),
-    canActivate: [authGuard, roleGuard([ERole.ROLE_AGENT])]
+    canActivate: [authGuard, roleGuard([ERole.ROLE_AGENT])],
+    data: { roles: [ERole.ROLE_AGENT] }
   },
   {
     path: 'provider',

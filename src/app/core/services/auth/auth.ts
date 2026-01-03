@@ -62,6 +62,12 @@ export class Auth {
     return this.userSubject.value?.email;
   }
 
+  // Get user by email (for agent sales)
+  // Using /users endpoint instead of /auth/users to avoid CORS and auth issues
+  getUserByEmail(email: string): Observable<IUser> {
+    return this.api.get<IUser>(`/auth/users/${email}`);
+  }
+
   private loadUserFromToken() {
     const token = this.getToken();
     if (token) this.decodeAndSetUser(token);
