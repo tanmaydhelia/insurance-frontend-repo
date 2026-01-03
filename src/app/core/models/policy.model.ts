@@ -21,8 +21,8 @@ export interface IPolicy {
   status: PolicyStatus;
   userId: number;
   agentId?: number; 
-  plan?: IInsurancePlan; // Backend returns 'plan', not 'insurancePlan'
-  insurancePlan?: IInsurancePlan; // Keep for backward compatibility
+  plan?: IInsurancePlan;
+  insurancePlan?: IInsurancePlan; 
 }
 
 export interface IPlanRequest {

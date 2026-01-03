@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IInsurancePlan } from '../../../../core/models/policy.model';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
@@ -10,6 +10,6 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
   styleUrl: './agent-plan-table.css',
 })
 export class AgentPlanTable {
-  plans = input.required<IInsurancePlan[]>();
-  onSelect = output<IInsurancePlan>();
+  @Input({ required: true }) plans!: IInsurancePlan[];
+  @Output() onSelect = new EventEmitter<IInsurancePlan>();
 }
