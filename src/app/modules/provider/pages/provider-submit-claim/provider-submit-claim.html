@@ -1,0 +1,25 @@
+<div class="max-w-3xl mx-auto py-10 px-4">
+      <h1 class="text-2xl font-bold text-gray-900 mb-8">Provider Portal</h1>
+
+      <app-hospital-selector (onSelect)="setHospital($event)"></app-hospital-selector>
+
+      @if (hospitalId()) {
+        <app-policy-finder (onSearch)="verifyPolicy($event)"></app-policy-finder>
+      }
+
+      @if (verifiedPolicy(); as policy) {
+        <div class="mt-8 bg-green-50 p-4 rounded-md border border-green-200 mb-8">
+           <p class="text-sm text-green-800 font-semibold">
+             <i class="pi pi-check-circle mr-2"></i>
+             Verified: {{ policy.plan?.name }}
+           </p>
+        </div>
+
+        <div class="bg-white shadow rounded-lg px-6 py-6 border border-gray-200">
+          <app-claim-form 
+            [isLoading]="isSubmitting" 
+            (onSubmit)="handleSubmit($event)">
+          </app-claim-form>
+        </div>
+      }
+    </div>

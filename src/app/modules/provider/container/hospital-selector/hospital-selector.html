@@ -1,0 +1,26 @@
+<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+  <h3 class="text-lg font-medium text-gray-900 mb-4">1. Select Hospital Facility</h3>
+
+  <div class="relative">
+    <label for="hospital" class="block text-sm font-medium text-gray-700 mb-1"
+      >Operating Hospital</label
+    >
+    <select
+      id="hospital"
+      [ngModel]="selectedId()"
+      (ngModelChange)="select($event)"
+      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+    >
+      <option [ngValue]="null">-- Select Hospital --</option>
+      @for (h of hospitals(); track h.id) {
+      <option [value]="h.id">{{ h.name }} ({{ h.address }})</option>
+      }
+    </select>
+
+    @if (selectedId()) {
+    <p class="mt-2 text-sm text-green-600 flex items-center">
+      <i class="pi pi-check-circle mr-1"></i> Hospital Linked
+    </p>
+    }
+  </div>
+</div>
