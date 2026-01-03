@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProviderSubmitClaim } from './pages/provider-submit-claim/provider-submit-claim';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'submit', pathMatch: 'full' },
-  { path: 'submit', component: ProviderSubmitClaim }
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: ProviderSubmitClaim }
 ];
 
 @NgModule({

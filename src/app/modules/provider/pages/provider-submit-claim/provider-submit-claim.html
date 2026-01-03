@@ -1,44 +1,25 @@
 <div class="max-w-3xl mx-auto py-10 px-4">
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Provider Portal</h1>
-    <p class="text-gray-500">Verify patient eligibility and submit cashless claims.</p>
-  </div>
+      <h1 class="text-2xl font-bold text-gray-900 mb-8">Provider Portal</h1>
 
-  <app-policy-finder (onSearch)="verifyPolicy($event)"></app-policy-finder>
+      <app-hospital-selector (onSelect)="setHospital($event)"></app-hospital-selector>
 
-  @if (verifiedPolicy(); as policy) {
-  <div class="mt-8 bg-green-50 p-4 rounded-md border border-green-200 mb-8 animate-fade-in">
-    <div class="flex">
-      <div class="shrink-0">
-        <i class="pi pi-check-circle text-green-400 text-xl"></i>
-      </div>
-      <div class="ml-3">
-        <h3 class="text-sm font-medium text-green-800">Policy Verified</h3>
-        <div class="mt-2 text-sm text-green-700">
-          <p><strong>Plan:</strong> {{ policy.plan?.name }}</p>
-          <p><strong>Valid Until:</strong> {{ policy.endDate | date : 'mediumDate' }}</p>
-          <p><strong>Status:</strong> {{ policy.status }}</p>
+      @if (hospitalId()) {
+        <app-policy-finder (onSearch)="verifyPolicy($event)"></app-policy-finder>
+      }
+
+      @if (verifiedPolicy(); as policy) {
+        <div class="mt-8 bg-green-50 p-4 rounded-md border border-green-200 mb-8">
+           <p class="text-sm text-green-800 font-semibold">
+             <i class="pi pi-check-circle mr-2"></i>
+             Verified: {{ policy.plan?.name }}
+           </p>
         </div>
-      </div>
+
+        <div class="bg-white shadow rounded-lg px-6 py-6 border border-gray-200">
+          <app-claim-form 
+            [isLoading]="isSubmitting" 
+            (onSubmit)="handleSubmit($event)">
+          </app-claim-form>
+        </div>
+      }
     </div>
-  </div>
-
-  <div class="bg-white shadow rounded-lg px-6 py-6 border border-gray-200 animate-slide-up">
-    <h3 class="text-lg font-medium text-gray-900 mb-6">Claim Details</h3>
-
-    <app-claim-form
-      [isLoading]="isSubmitting"
-      (onSubmit)="handleSubmit($event)"
-      (onCancel)="reset()"
-    >
-    </app-claim-form>
-  </div>
-  } @else if (error()) {
-  <div class="mt-4 bg-red-50 p-4 rounded-md border border-red-200">
-    <p class="text-sm text-red-700 flex items-center gap-2">
-      <i class="pi pi-times-circle"></i>
-      {{ error() }}
-    </p>
-  </div>
-  }
-</div>

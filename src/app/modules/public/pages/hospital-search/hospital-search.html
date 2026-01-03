@@ -1,0 +1,40 @@
+<div class="bg-gray-50 min-h-screen pb-12">
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto py-12 px-4 text-center">
+      <h1 class="text-4xl font-extrabold text-gray-900">Network Hospitals</h1>
+      <p class="mt-4 text-xl text-gray-500">Find cashless treatment centers near you.</p>
+
+      <div class="max-w-xl mx-auto mt-8 relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <i class="pi pi-search text-gray-400"></i>
+        </div>
+        <input
+          type="text"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="search($event)"
+          class="block w-full rounded-md border-gray-300 py-3 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border"
+          placeholder="Search by hospital name..."
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 mt-8">
+    @if (isLoading()) {
+    <div class="flex justify-center py-12">
+      <i class="pi pi-spin pi-spinner text-4xl text-indigo-600"></i>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (hosp of hospitals(); track hosp.id) {
+      <app-hospital-card [hospital]="hosp"></app-hospital-card>
+      } @empty {
+      <div class="col-span-full text-center py-12">
+        <i class="pi pi-building text-gray-300 text-5xl mb-4"></i>
+        <p class="text-gray-500">No hospitals found matching your search.</p>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>
