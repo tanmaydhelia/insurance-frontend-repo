@@ -1,0 +1,93 @@
+<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg border border-gray-200">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Claim ID
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Policy
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Diagnosis
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Amount
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Date
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Status
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      @for (claim of claims(); track claim.id) {
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+          #{{ claim.id }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          Policy #{{ claim.policyId }}
+        </td>
+        <td
+          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate"
+          title="{{ claim.diagnosis }}"
+        >
+          {{ claim.diagnosis }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+          {{ claim.claimAmount | currency : 'INR' : 'symbol' : '1.0-0' }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          {{ claim.date || 'Today' }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span
+            [class]="getStatusClass(claim.status)"
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+          >
+            {{ claim.status }}
+          </span>
+          @if (claim.status === 'REJECTED' && claim.rejectionReason) {
+          <p
+            class="text-xs text-red-500 mt-1 truncate max-w-37.5"
+            title="{{ claim.rejectionReason }}"
+          >
+            {{ claim.rejectionReason }}
+          </p>
+          }
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+          <div class="flex flex-col items-center gap-2">
+            <i class="pi pi-file-o text-2xl text-gray-400"></i>
+            <p>You haven't raised any claims yet.</p>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

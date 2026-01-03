@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MemberRoutingModule } from './member-routing-module';
 import { MemberDashboard } from './pages/member-dashboard/member-dashboard';
 import { RaiseClaims } from './pages/raise-claims/raise-claims';
+import { ClaimHistory } from './pages/claim-history/claim-history';
 
 
 @NgModule({
@@ -12,7 +13,8 @@ import { RaiseClaims } from './pages/raise-claims/raise-claims';
     CommonModule,
     MemberRoutingModule,
     MemberDashboard,
-    RaiseClaims
+    RaiseClaims,
+    ClaimHistory
   ]
 })
 export class MemberModule { }
