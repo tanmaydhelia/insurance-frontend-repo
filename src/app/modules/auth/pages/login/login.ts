@@ -25,7 +25,7 @@ export class Login {
     this.errorMessage = null;
     
     const credentials: IAuthRequest = {
-      username: formData.username,
+      email: formData.email,
       password: formData.password
     };
 

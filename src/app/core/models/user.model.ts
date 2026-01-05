@@ -16,12 +16,12 @@ export interface IUser {
 }
 
 export interface IAuthRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface IChangePasswordRequest {
-  username: string;
+  email: string;
   oldPassword: string;
   newPassword: string;
 }

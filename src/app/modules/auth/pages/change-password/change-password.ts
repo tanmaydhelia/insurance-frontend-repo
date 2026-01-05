@@ -23,12 +23,12 @@ export class ChangePassword {
   messageType = signal<'success' | 'error' | ''>('');
 
   onUpdate(formData: any) {
-    const username = this.auth.getUsername();
+    const email = this.auth.getUserEmail();
     
-    console.log('Change password attempt for username:', username);
+    console.log('Change password attempt for email:', email);
     
-    if (!username) {
-      console.error('No username or email found - user may not be authenticated');
+    if (!email) {
+      console.error('No email found - user may not be authenticated');
       this.showMessage('User not authenticated. Please login again.', 'error');
       setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       return;
@@ -39,12 +39,12 @@ export class ChangePassword {
     this.messageType.set('');
 
     const request: IChangePasswordRequest = {
-      username: username,
+      email: email,
       oldPassword: formData.oldPassword,
       newPassword: formData.newPassword
     };
 
-    console.log('Sending change password request for:', username);
+    console.log('Sending change password request for:', email);
 
     this.auth.changePassword(request).subscribe({
       next: (res) => {
