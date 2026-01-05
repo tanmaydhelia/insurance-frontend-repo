@@ -1,0 +1,554 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Admin Analytics</h1>
+      <p class="text-gray-500 text-sm mt-1">System-wide performance metrics and insights</p>
+    </div>
+    <button 
+      routerLink="/admin/dashboard"
+      class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+      <i class="pi pi-arrow-left mr-2"></i>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Key Metrics Grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Plans -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+          <i class="pi pi-briefcase text-blue-600 text-lg"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Plans</p>
+          <p class="text-2xl font-bold text-gray-900">{{ totalPlans() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Claims -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center shrink-0">
+          <i class="pi pi-file text-purple-600 text-lg"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Claims</p>
+          <p class="text-2xl font-bold text-gray-900">{{ totalClaims() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approval Rate -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
+          <i class="pi pi-check-circle text-green-600 text-lg"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Approval</p>
+          <p class="text-2xl font-bold text-green-600">{{ approvalRate() }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avg Claim -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+          <i class="pi pi-chart-line text-amber-600 text-lg"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Avg Claim</p>
+          <p class="text-2xl font-bold text-gray-900">₹{{ avgClaimAmount() | number:'1.0-0' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    <!-- Donut Chart - Claims Distribution -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-base font-semibold text-gray-900 mb-6">Claims Distribution</h2>
+      
+      <div class="flex items-center justify-center gap-8">
+        <!-- Donut Chart SVG -->
+        <div class="relative">
+          <svg width="180" height="180" viewBox="0 0 100 100" class="transform -rotate-90">
+            <!-- Background circle -->
+            <circle 
+              cx="50" cy="50" r="40" 
+              fill="none" 
+              stroke="#f3f4f6" 
+              stroke-width="12">
+            </circle>
+            
+            <!-- Chart segments -->
+            @for (segment of pieChartData(); track segment.label) {
+              <circle 
+                cx="50" cy="50" r="40" 
+                fill="none" 
+                [attr.stroke]="segment.color"
+                stroke-width="12"
+                [attr.stroke-dasharray]="getStrokeDasharray(segment.percentage)"
+                [attr.stroke-dashoffset]="getStrokeDashoffset(segment.offset)"
+                class="transition-all duration-700 ease-out">
+              </circle>
+            }
+          </svg>
+          
+          <!-- Center Text -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-3xl font-bold text-gray-900">{{ totalClaims() }}</span>
+            <span class="text-xs text-gray-500">Total</span>
+          </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Approved</p>
+              <p class="text-xs text-gray-500">{{ approvedClaims() }} claims</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Pending</p>
+              <p class="text-xs text-gray-500">{{ pendingClaims() }} claims</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Rejected</p>
+              <p class="text-xs text-gray-500">{{ rejectedClaims() }} claims</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar Chart - Financial Breakdown -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-base font-semibold text-gray-900 mb-6">Financial Breakdown</h2>
+      
+      <div class="space-y-5">
+        @for (bar of barChartData(); track bar.label) {
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">{{ bar.label }}</span>
+              <span [class]="'text-sm font-bold ' + bar.textColor">₹{{ bar.value | number:'1.0-0' }}</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div 
+                [class]="bar.color + ' h-3 rounded-full transition-all duration-700 ease-out'"
+                [style.width.%]="bar.percentage">
+              </div>
+            </div>
+          </div>
+        }
+        
+        <!-- Total -->
+        <div class="pt-4 border-t border-gray-100">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-gray-900">Total Amount</span>
+            <span class="text-lg font-bold text-gray-900">₹{{ totalClaimAmount() | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Rings Row -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Approval Rate Ring -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4 text-center">Approval Rate</h3>
+      <div class="flex justify-center">
+        <div class="relative">
+          <svg width="140" height="140" viewBox="0 0 120 120">
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#f3f4f6" 
+              stroke-width="10">
+            </circle>
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#22c55e" 
+              stroke-width="10"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="'339.292'"
+              [style.stroke-dashoffset]="339.292 - (approvalRate() / 100) * 339.292"
+              class="transition-all duration-1000 ease-out"
+              transform="rotate(-90 60 60)">
+            </circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-green-600">{{ approvalRate() }}%</span>
+            <span class="text-xs text-gray-500">approved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejection Rate Ring -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4 text-center">Rejection Rate</h3>
+      <div class="flex justify-center">
+        <div class="relative">
+          <svg width="140" height="140" viewBox="0 0 120 120">
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#f3f4f6" 
+              stroke-width="10">
+            </circle>
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#ef4444" 
+              stroke-width="10"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="'339.292'"
+              [style.stroke-dashoffset]="339.292 - (rejectionRate() / 100) * 339.292"
+              class="transition-all duration-1000 ease-out"
+              transform="rotate(-90 60 60)">
+            </circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-red-600">{{ rejectionRate() }}%</span>
+            <span class="text-xs text-gray-500">rejected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Rate Ring -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4 text-center">Pending Rate</h3>
+      <div class="flex justify-center">
+        <div class="relative">
+          <svg width="140" height="140" viewBox="0 0 120 120">
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#f3f4f6" 
+              stroke-width="10">
+            </circle>
+            <circle 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#eab308" 
+              stroke-width="10"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="'339.292'"
+              [style.stroke-dashoffset]="339.292 - ((100 - approvalRate() - rejectionRate()) / 100) * 339.292"
+              class="transition-all duration-1000 ease-out"
+              transform="rotate(-90 60 60)">
+            </circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-yellow-600">{{ 100 - approvalRate() - rejectionRate() }}%</span>
+            <span class="text-xs text-gray-500">pending</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <!-- Submitted -->
+    <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <i class="pi pi-send text-xl text-blue-600"></i>
+        <span class="text-xs font-medium text-blue-600 bg-blue-200 px-2 py-0.5 rounded-full">New</span>
+      </div>
+      <p class="text-2xl font-bold text-blue-900">{{ submittedClaims() }}</p>
+      <p class="text-xs text-blue-700 mt-1">Submitted Claims</p>
+    </div>
+
+    <!-- In Review -->
+    <div class="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <i class="pi pi-search text-xl text-orange-600"></i>
+        <span class="text-xs font-medium text-orange-600 bg-orange-200 px-2 py-0.5 rounded-full">Processing</span>
+      </div>
+      <p class="text-2xl font-bold text-orange-900">{{ inReviewClaims() }}</p>
+      <p class="text-xs text-orange-700 mt-1">In Review</p>
+    </div>
+
+    <!-- Approved -->
+    <div class="bg-linear-to-br from-green-50 to-green-100 rounded-xl border border-green-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <i class="pi pi-check-circle text-xl text-green-600"></i>
+        <span class="text-xs font-medium text-green-600 bg-green-200 px-2 py-0.5 rounded-full">Complete</span>
+      </div>
+      <p class="text-2xl font-bold text-green-900">{{ approvedClaims() }}</p>
+      <p class="text-xs text-green-700 mt-1">Approved Claims</p>
+    </div>
+
+    <!-- Rejected -->
+    <div class="bg-linear-to-br from-red-50 to-red-100 rounded-xl border border-red-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <i class="pi pi-times-circle text-xl text-red-600"></i>
+        <span class="text-xs font-medium text-red-600 bg-red-200 px-2 py-0.5 rounded-full">Denied</span>
+      </div>
+      <p class="text-2xl font-bold text-red-900">{{ rejectedClaims() }}</p>
+      <p class="text-xs text-red-700 mt-1">Rejected Claims</p>
+    </div>
+  </div>
+
+  <!-- Financial Summary Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-base font-semibold text-gray-900">Financial Summary</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Claims</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">% of Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                <span class="text-sm font-medium text-gray-900">Approved</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ approvedClaims() }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-green-600">₹{{ approvedClaimAmount() | number:'1.0-0' }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-16 bg-gray-200 rounded-full h-1.5">
+                  <div class="bg-green-500 h-1.5 rounded-full" [style.width.%]="totalClaimAmount() > 0 ? (approvedClaimAmount() / totalClaimAmount()) * 100 : 0"></div>
+                </div>
+                <span class="text-xs text-gray-500">{{ totalClaimAmount() > 0 ? ((approvedClaimAmount() / totalClaimAmount()) * 100 | number:'1.0-0') : 0 }}%</span>
+              </div>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                <span class="text-sm font-medium text-gray-900">Pending</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ pendingClaims() }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-yellow-600">₹{{ pendingClaimAmount() | number:'1.0-0' }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-16 bg-gray-200 rounded-full h-1.5">
+                  <div class="bg-yellow-500 h-1.5 rounded-full" [style.width.%]="totalClaimAmount() > 0 ? (pendingClaimAmount() / totalClaimAmount()) * 100 : 0"></div>
+                </div>
+                <span class="text-xs text-gray-500">{{ totalClaimAmount() > 0 ? ((pendingClaimAmount() / totalClaimAmount()) * 100 | number:'1.0-0') : 0 }}%</span>
+              </div>
+            </td>
+          </tr>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <span class="text-sm font-medium text-gray-900">Rejected</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ rejectedClaims() }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-red-600">₹{{ rejectedClaimAmount() | number:'1.0-0' }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-16 bg-gray-200 rounded-full h-1.5">
+                  <div class="bg-red-500 h-1.5 rounded-full" [style.width.%]="totalClaimAmount() > 0 ? (rejectedClaimAmount() / totalClaimAmount()) * 100 : 0"></div>
+                </div>
+                <span class="text-xs text-gray-500">{{ totalClaimAmount() > 0 ? ((rejectedClaimAmount() / totalClaimAmount()) * 100 | number:'1.0-0') : 0 }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-gray-50">
+          <tr>
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">Total</td>
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ totalClaims() }}</td>
+            <td class="px-6 py-4 text-sm font-bold text-gray-900">₹{{ totalClaimAmount() | number:'1.0-0' }}</td>
+            <td class="px-6 py-4 text-sm font-semibold text-gray-900">100%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Claims Officer Performance Section -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-gray-900">Claims by Officer</h2>
+        <p class="text-xs text-gray-500 mt-0.5">Performance breakdown of claims officers</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-500">{{ totalOfficers() }} Officers</span>
+        <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+          <i class="pi pi-users text-indigo-600 text-sm"></i>
+        </div>
+      </div>
+    </div>
+
+    @if (claimsByOfficer().length === 0) {
+      <div class="p-12 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-user text-2xl text-gray-400"></i>
+        </div>
+        <p class="text-gray-500 text-sm">No claims have been processed yet</p>
+        <p class="text-gray-400 text-xs mt-1">Officer data will appear once claims are approved or rejected</p>
+      </div>
+    } @else {
+      <!-- Top Officer Highlight -->
+      @if (topOfficer(); as top) {
+        <div class="px-6 py-4 bg-linear-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+              {{ top.name.charAt(0).toUpperCase() }}
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <p class="font-semibold text-gray-900">{{ top.name }}</p>
+                <span class="text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full">
+                  <i class="pi pi-star-fill text-[10px] mr-1"></i>Top Performer
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-0.5">{{ top.total }} claims processed • {{ getOfficerApprovalRate(top) }}% approval rate</p>
+            </div>
+            <div class="text-right">
+              <p class="text-lg font-bold text-green-600">₹{{ top.approvedAmount | number:'1.0-0' }}</p>
+              <p class="text-xs text-gray-500">approved</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Officers Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Officer</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Approved</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Rejected</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Approval Rate</th>
+              <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount Approved</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (officer of claimsByOfficer(); track officer.name) {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-medium text-sm">
+                      {{ officer.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="text-sm font-medium text-gray-900">{{ officer.name }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-sm font-semibold text-gray-900">{{ officer.total }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center gap-1 text-sm font-medium text-green-600">
+                    <i class="pi pi-check-circle text-xs"></i>
+                    {{ officer.approved }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center gap-1 text-sm font-medium text-red-600">
+                    <i class="pi pi-times-circle text-xs"></i>
+                    {{ officer.rejected }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-center gap-2">
+                    <div class="w-16 bg-gray-200 rounded-full h-1.5">
+                      <div 
+                        class="h-1.5 rounded-full transition-all duration-500"
+                        [class.bg-green-500]="getOfficerApprovalRate(officer) >= 70"
+                        [class.bg-yellow-500]="getOfficerApprovalRate(officer) >= 40 && getOfficerApprovalRate(officer) < 70"
+                        [class.bg-red-500]="getOfficerApprovalRate(officer) < 40"
+                        [style.width.%]="getOfficerApprovalRate(officer)">
+                      </div>
+                    </div>
+                    <span class="text-xs font-medium text-gray-600 w-10">{{ getOfficerApprovalRate(officer) }}%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <span class="text-sm font-bold text-green-600">₹{{ officer.approvedAmount | number:'1.0-0' }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <!-- Quick Stats - Approved vs Rejected Summary -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Approved Claims Summary -->
+    <div class="bg-linear-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-100 text-sm font-medium">Approved Claims</p>
+          <p class="text-4xl font-bold mt-2">{{ approvedClaims() }}</p>
+          <p class="text-green-100 text-xs mt-2">
+            <i class="pi pi-indian-rupee text-[10px]"></i>
+            {{ approvedClaimAmount() | number:'1.0-0' }} total approved
+          </p>
+        </div>
+        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+          <i class="pi pi-check-circle text-3xl"></i>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-white/20">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-green-100">Approval Rate</span>
+          <span class="font-bold">{{ approvalRate() }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejected Claims Summary -->
+    <div class="bg-linear-to-br from-red-500 to-rose-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-red-100 text-sm font-medium">Rejected Claims</p>
+          <p class="text-4xl font-bold mt-2">{{ rejectedClaims() }}</p>
+          <p class="text-red-100 text-xs mt-2">
+            <i class="pi pi-indian-rupee text-[10px]"></i>
+            {{ rejectedClaimAmount() | number:'1.0-0' }} total rejected
+          </p>
+        </div>
+        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+          <i class="pi pi-times-circle text-3xl"></i>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-white/20">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-red-100">Rejection Rate</span>
+          <span class="font-bold">{{ rejectionRate() }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

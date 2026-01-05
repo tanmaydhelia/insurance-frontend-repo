@@ -1,11 +1,21 @@
 <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
   <nav class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center" role="navigation">
     
+    <!-- Hamburger Button for Mobile -->
+    <button 
+      *ngIf="(user$ | async)"
+      (click)="onToggleSidebar()"
+      class="lg:hidden p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors mr-3">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+    
     <div class="shrink-0">
       <a routerLink="/" class="flex items-center gap-2 group">
         <i class="pi pi-shield text-2xl text-blue-600 group-hover:text-blue-700 transition-colors"></i>
         <span class="text-xl font-bold tracking-tight text-gray-900 group-hover:text-blue-700 transition-colors">
-          InsuranceApp
+          Insurance App
         </span>
       </a>
     </div>

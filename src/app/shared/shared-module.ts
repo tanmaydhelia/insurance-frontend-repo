@@ -5,6 +5,7 @@ import { HasRole } from './directives/has-role';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Footer } from './components/footer/footer';
+import { Sidebar } from './components/sidebar/sidebar';
 
 
 
@@ -17,6 +18,7 @@ import { Footer } from './components/footer/footer';
     FormsModule,
     Header,
     Footer,
+    Sidebar,
     HasRole
   ],
   exports: [
@@ -26,6 +28,7 @@ import { Footer } from './components/footer/footer';
     FormsModule,
     Header,
     Footer,
+    Sidebar,
     HasRole
   ]
 })

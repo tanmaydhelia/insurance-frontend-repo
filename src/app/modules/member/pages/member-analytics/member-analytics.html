@@ -1,0 +1,145 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">My Analytics</h1>
+      <p class="text-gray-600 mt-1">Your insurance coverage and claims overview</p>
+    </div>
+    <button 
+      routerLink="/member/dashboard"
+      class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+      <i class="pi pi-arrow-left mr-2"></i>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Key Metrics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Policies -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">My Policies</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2">{{ totalPolicies() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i class="pi pi-shield text-blue-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Policies -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Active Policies</p>
+          <p class="text-3xl font-bold text-green-600 mt-2">{{ activePolicies() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i class="pi pi-check-circle text-green-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Claims -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Total Claims</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2">{{ totalClaims() }}</p>
+        </div>
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <i class="pi pi-file text-purple-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approved Amount -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Approved Amount</p>
+          <p class="text-3xl font-bold text-green-600 mt-2">₹{{ approvedAmount() | number:'1.0-0' }}</p>
+        </div>
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i class="pi pi-money-bill text-green-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claims Status & Financial Summary -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Claims Status -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">My Claims Status</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-clock text-yellow-600 text-xl"></i>
+            <span class="font-medium text-gray-900">Pending</span>
+          </div>
+          <span class="text-lg font-bold text-yellow-600">{{ pendingClaims() }}</span>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+            <span class="font-medium text-gray-900">Approved</span>
+          </div>
+          <span class="text-lg font-bold text-green-600">{{ approvedClaims() }}</span>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-times-circle text-red-600 text-xl"></i>
+            <span class="font-medium text-gray-900">Rejected</span>
+          </div>
+          <span class="text-lg font-bold text-red-600">{{ rejectedClaims() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Financial Overview</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-600">Total Premium Paid</span>
+          <span class="text-sm font-bold text-gray-900">₹{{ totalPremiumPaid() | number:'1.0-0' }}</span>
+        </div>
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-600">Total Claimed</span>
+          <span class="text-sm font-bold text-gray-900">₹{{ totalClaimedAmount() | number:'1.0-0' }}</span>
+        </div>
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-600">Approved Amount</span>
+          <span class="text-sm font-bold text-green-600">₹{{ approvedAmount() | number:'1.0-0' }}</span>
+        </div>
+        <div class="flex items-center justify-between py-3">
+          <span class="text-sm text-gray-600">Return Ratio</span>
+          <span class="text-sm font-bold" [class.text-green-600]="savingsRatio() > 0" [class.text-gray-900]="savingsRatio() === 0">
+            {{ savingsRatio() }}%
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Summary -->
+  <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl shadow-sm border border-blue-200 p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-blue-900 mb-2">Your Coverage</h2>
+        <p class="text-sm text-blue-700">
+          You have <span class="font-bold">{{ activePolicies() }}</span> active 
+          {{ activePolicies() === 1 ? 'policy' : 'policies' }} protecting you
+        </p>
+      </div>
+      <button 
+        routerLink="/public/search"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
+        <i class="pi pi-plus mr-2"></i>
+        Add More Coverage
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SharedModule } from './shared/shared-module';
+import { Sidebar } from './shared/components/sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,10 @@ import { SharedModule } from './shared/shared-module';
 })
 export class App {
   protected readonly title = signal('insurance-app');
+  
+  @ViewChild(Sidebar) sidebar?: Sidebar;
+
+  toggleSidebar() {
+    this.sidebar?.toggleSidebar();
+  }
 }

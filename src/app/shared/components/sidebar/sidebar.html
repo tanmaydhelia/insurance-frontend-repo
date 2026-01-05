@@ -1,0 +1,133 @@
+<!-- Backdrop Overlay -->
+<div 
+  *ngIf="isOpen() && (user$ | async)"
+  (click)="closeSidebar()"
+  class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity">
+</div>
+
+<!-- Sidebar -->
+<aside 
+  *ngIf="(user$ | async) as user"
+  [class.translate-x-0]="isOpen()"
+  class="fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-40 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto overflow-x-hidden lg:translate-x-0 lg:sticky lg:shadow-lg sidebar-scroll">
+  
+  <!-- Sidebar Header -->
+  <div class="p-6 border-b border-gray-200 bg-blue-600">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold text-xl shadow-md">
+          {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+        <div class="text-white">
+          <p class="font-semibold text-sm">{{ user.name }}</p>
+          <p class="text-xs text-blue-100">{{ user.email }}</p>
+        </div>
+      </div>
+      <button 
+        (click)="closeSidebar()"
+        class="lg:hidden text-white hover:bg-blue-800 p-2 rounded-lg transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Member Menu -->
+  <nav *appHasRole="['ROLE_USER']" class="p-4">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Member Portal</p>
+    <ul class="space-y-1">
+      <li *ngFor="let item of memberMenuItems">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-blue-600 group">
+          <i [class]="item.icon + ' text-lg group-hover:scale-110 transition-transform'"></i>
+          <span class="font-medium text-sm">{{ item.label }}</span>
+          <span *ngIf="item.badge" class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+            {{ item.badge }}
+          </span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Admin Menu -->
+  <nav *appHasRole="['ROLE_ADMIN']" class="p-4">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Admin Portal</p>
+    <ul class="space-y-1">
+      <li *ngFor="let item of adminMenuItems">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-blue-600 group">
+          <i [class]="item.icon + ' text-lg group-hover:scale-110 transition-transform'"></i>
+          <span class="font-medium text-sm">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Agent Menu -->
+  <nav *appHasRole="['ROLE_AGENT']" class="p-4">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Agent Portal</p>
+    <ul class="space-y-1">
+      <li *ngFor="let item of agentMenuItems">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-blue-600 group">
+          <i [class]="item.icon + ' text-lg group-hover:scale-110 transition-transform'"></i>
+          <span class="font-medium text-sm">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Provider Menu -->
+  <nav *appHasRole="['ROLE_PROVIDER']" class="p-4">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Provider Portal</p>
+    <ul class="space-y-1">
+      <li *ngFor="let item of providerMenuItems">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-blue-600 group">
+          <i [class]="item.icon + ' text-lg group-hover:scale-110 transition-transform'"></i>
+          <span class="font-medium text-sm">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Claims Officer Menu -->
+  <nav *appHasRole="['ROLE_CLAIMS_OFFICER']" class="p-4">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Claims Portal</p>
+    <ul class="space-y-1">
+      <li *ngFor="let item of claimsOfficerMenuItems">
+        <a 
+          [routerLink]="item.route"
+          routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-blue-600 group">
+          <i [class]="item.icon + ' text-lg group-hover:scale-110 transition-transform'"></i>
+          <span class="font-medium text-sm">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Logout Button -->
+  <div class="p-4 border-t border-gray-200 mt-auto">
+    <button 
+      (click)="logout()"
+      class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-100">
+      <i class="pi pi-sign-out"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</aside>

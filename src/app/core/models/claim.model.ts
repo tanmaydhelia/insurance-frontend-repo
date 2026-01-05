@@ -21,6 +21,9 @@ export interface IClaim {
   rejectionReason?: string;
   documentUrl?: string;
   date: string;
+  processedBy?: string;     
+  processedById?: number;      
+  processedDate?: string;      
 }
 
 

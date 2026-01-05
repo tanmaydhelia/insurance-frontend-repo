@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IUser } from '../../../core/models/user.model';
 import { Auth } from '../../../core/services/auth/auth';
@@ -17,9 +17,15 @@ export class Header {
   public auth = inject(Auth);
   private router = inject(Router);
   user$ = this.auth.user$;
+  
+  toggleSidebar = output<void>();
 
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/auth/login']);
+  }
+  
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
   }
 }

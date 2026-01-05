@@ -7,6 +7,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ClaimStatus } from '../../../../core/models/claim.model';
 import { Router } from '@angular/router';
 import { Dialog } from '../../../../core/services/dialog/dialog';
+import { Auth } from '../../../../core/services/auth/auth';
 
 @Component({
   selector: 'app-claims-officer-dashboard',
@@ -16,18 +17,36 @@ import { Dialog } from '../../../../core/services/dialog/dialog';
   styleUrl: './claims-officer-dashboard.css',
 })
 export class ClaimsOfficerDashboard {
-  private claimService = inject(Claim); // Ensure Service Name matches your file
+  private claimService = inject(Claim);
+  private authService = inject(Auth);
   private refresh$ = new Subject<void>();
   private router = inject(Router);
   private dialogService = inject(Dialog);
 
-  // Reactive Data Stream
+  // Get current officer's ID
+  private get officerId(): number {
+    return this.authService.getUserId() || 0;
+  }
+
+  // Reactive Data Stream - Available claims (SUBMITTED only)
   claims = toSignal(
     this.refresh$.pipe(
-      startWith(undefined), // Load immediately on init
+      startWith(undefined),
       switchMap(() => this.claimService.getOpenClaims()),
       catchError((err) => {
         console.error('Error fetching claims:', err);
+        return of([]);
+      })
+    )
+  );
+
+  // My picked up claims (IN_REVIEW by me)
+  myInReviewClaims = toSignal(
+    this.refresh$.pipe(
+      startWith(undefined),
+      switchMap(() => this.claimService.getMyInReviewClaims(this.officerId)),
+      catchError((err) => {
+        console.error('Error fetching my in-review claims:', err);
         return of([]);
       })
     )
@@ -39,50 +58,25 @@ export class ClaimsOfficerDashboard {
     this.refresh$.next();
   }
 
-  handleApprove(id: number) {
-    this.dialogService.confirm({
-      title: 'Confirm Approval',
-      message: 'Confirm APPROVAL for this claim? This will authorize the payout.',
-      type: 'success',
-      confirmText: 'Approve',
-      cancelText: 'Cancel'
-    }).subscribe(confirmed => {
-      if (confirmed) {
-        this.updateStatus(id, ClaimStatus.APPROVED);
-      }
-    });
-  }
-
-  handleReject(id: number) {
-    this.dialogService.prompt({
-      title: 'Reject Claim',
-      message: 'Please provide a reason for rejection (Required):',
-      placeholder: 'Enter rejection reason...',
-      type: 'warning',
-      confirmText: 'Reject',
-      cancelText: 'Cancel'
-    }).subscribe(reason => {
-      if (reason && reason.trim().length > 0) {
-        this.updateStatus(id, ClaimStatus.REJECTED, reason);
-      }
-    });
-  }
-
   handleView(id: number) {
-    this.router.navigate(['/claims/details', id]);
-  }
-
-  private updateStatus(id: number, status: ClaimStatus, reason?: string) {
-    this.claimService.updateClaimStatus(id, { status, rejectionReason: reason }).subscribe({
+    // Pickup the claim (set to IN_REVIEW) before navigating
+    // This hides it from other officers
+    this.claimService.pickupClaim(id).subscribe({
       next: () => {
-        this.refresh();
-        this.dialogService.success(
-          status === ClaimStatus.APPROVED ? 'Claim Approved Successfully' : 'Claim Rejected'
-        );
+        this.router.navigate(['/claims/details', id]);
       },
       error: (err) => {
-        this.dialogService.error('Action Failed: ' + (err.error?.message || 'Unknown Error'));
-      },
+        // If pickup fails (e.g., already picked up by another officer), show error
+        this.dialogService.error(
+          'This claim may have already been picked up by another officer. Please refresh the queue.'
+        );
+        this.refresh();
+      }
     });
+  }
+
+  // For viewing already picked up claims - no need to pickup again
+  handleViewMyInReview(id: number) {
+    this.router.navigate(['/claims/details', id]);
   }
 }
