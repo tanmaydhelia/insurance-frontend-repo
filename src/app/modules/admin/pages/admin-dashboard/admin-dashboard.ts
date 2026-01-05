@@ -5,6 +5,7 @@ import { Policy } from '../../../../core/services/policy/policy';
 import { catchError, of, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IPlanRequest } from '../../../../core/models/policy.model';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -15,6 +16,7 @@ import { IPlanRequest } from '../../../../core/models/policy.model';
 })
 export class AdminDashboard {
   private policyService = inject(Policy);
+  private dialogService = inject(Dialog);
   private refresh$ = new Subject<void>();
 
   isCreating = signal(false); // Used to pass loading state to dumb component if needed
@@ -33,12 +35,12 @@ export class AdminDashboard {
     this.policyService.createPlan(formData).subscribe({
       next: () => {
         this.isCreating.set(false);
-        alert('Plan created successfully!');
+        this.dialogService.success('Plan created successfully!');
         this.refresh$.next(); // Refresh list
       },
       error: (err) => {
         this.isCreating.set(false);
-        alert('Failed to create plan: ' + err.message);
+        this.dialogService.error('Failed to create plan: ' + err.message);
       },
     });
   }

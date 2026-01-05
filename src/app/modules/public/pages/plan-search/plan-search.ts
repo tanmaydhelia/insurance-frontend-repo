@@ -7,6 +7,7 @@ import { Policy } from '../../../../core/services/policy/policy';
 import { Auth } from '../../../../core/services/auth/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-plan-search',
@@ -19,6 +20,7 @@ export class PlanSearch {
   private policyService = inject(Policy);
   private authService = inject(Auth);
   private router = inject(Router);
+  private dialogService = inject(Dialog);
 
   // Fetch plans via Signal
   plans = toSignal(
@@ -44,13 +46,21 @@ export class PlanSearch {
     const userId = this.authService.getUserId();
     
     if (!userId) {
-      alert('Unable to get user information. Please try logging in again.');
+      this.dialogService.error('Unable to get user information. Please try logging in again.');
       this.authService.logout();
       return;
     }
 
     // Confirm purchase
-    if (confirm('Confirm purchase of this plan? (Mock Payment)')) {
+    this.dialogService.confirm({
+      title: 'Confirm Purchase',
+      message: 'Confirm purchase of this plan? (Mock Payment)',
+      type: 'info',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+
       const request: IPolicyEnrollmentRequest = {
         userId: userId,
         planId: planId
@@ -58,13 +68,14 @@ export class PlanSearch {
 
       this.policyService.enrollPolicy(request).subscribe({
         next: () => {
-          alert('Enrollment Successful! Redirecting to Dashboard.');
-          this.router.navigate(['/member/dashboard']);
+          this.dialogService.success('Enrollment Successful! Redirecting to Dashboard.').subscribe(() => {
+            this.router.navigate(['/member/dashboard']);
+          });
         },
         error: (err) => {
-          alert('Enrollment Failed: ' + (err.error?.message || 'Unknown Error'));
+          this.dialogService.error('Enrollment Failed: ' + (err.error?.message || 'Unknown Error'));
         }
       });
-    }
+    });
   }
 }

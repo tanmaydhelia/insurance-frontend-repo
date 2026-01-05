@@ -9,6 +9,7 @@ import { IClaimRequest, SubmissionSource } from '../../../../core/models/claim.m
 import { ClaimForm } from '../../../../shared/components/claim-form/claim-form';
 import { HospitalSelector } from '../../container/hospital-selector/hospital-selector';
 import { switchMap } from 'rxjs';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-provider-submit-claim',
@@ -21,6 +22,7 @@ export class ProviderSubmitClaim {
   private policyService = inject(Policy);
   private claimService = inject(Claim);
   private router = inject(Router);
+  private dialogService = inject(Dialog);
 
   hospitalId = signal<number | null>(null);
   verifiedPolicy = signal<IPolicy | null>(null);
@@ -42,7 +44,7 @@ export class ProviderSubmitClaim {
     const hospId = this.hospitalId();
 
     if (!policy || !hospId) {
-      alert('Missing Policy or Hospital information');
+      this.dialogService.warning('Missing Policy or Hospital information');
       return;
     }
 
@@ -66,12 +68,13 @@ export class ProviderSubmitClaim {
 
     process$.subscribe({
       next: () => {
-        alert('Claim Submitted Successfully!');
-        this.router.navigate(['/']);
+        this.dialogService.success('Claim Submitted Successfully!').subscribe(() => {
+          this.router.navigate(['/']);
+        });
       },
       error: (err) => {
         this.isSubmitting = false;
-        alert('Failed to submit claim: ' + (err.error?.message || err.message));
+        this.dialogService.error('Failed to submit claim: ' + (err.error?.message || err.message));
       },
     });
   }

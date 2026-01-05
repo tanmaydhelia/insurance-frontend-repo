@@ -6,6 +6,7 @@ import { catchError, of, startWith, Subject, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ClaimStatus } from '../../../../core/models/claim.model';
 import { Router } from '@angular/router';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-claims-officer-dashboard',
@@ -18,6 +19,7 @@ export class ClaimsOfficerDashboard {
   private claimService = inject(Claim); // Ensure Service Name matches your file
   private refresh$ = new Subject<void>();
   private router = inject(Router);
+  private dialogService = inject(Dialog);
 
   // Reactive Data Stream
   claims = toSignal(
@@ -38,18 +40,32 @@ export class ClaimsOfficerDashboard {
   }
 
   handleApprove(id: number) {
-    if (confirm('Confirm APPROVAL for this claim? This will authorize the payout.')) {
-      this.updateStatus(id, ClaimStatus.APPROVED);
-    }
+    this.dialogService.confirm({
+      title: 'Confirm Approval',
+      message: 'Confirm APPROVAL for this claim? This will authorize the payout.',
+      type: 'success',
+      confirmText: 'Approve',
+      cancelText: 'Cancel'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.updateStatus(id, ClaimStatus.APPROVED);
+      }
+    });
   }
 
   handleReject(id: number) {
-    const reason = prompt('Please provide a reason for rejection (Required):');
-    if (reason && reason.trim().length > 0) {
-      this.updateStatus(id, ClaimStatus.REJECTED, reason);
-    } else if (reason !== null) {
-      alert('Rejection reason is required.');
-    }
+    this.dialogService.prompt({
+      title: 'Reject Claim',
+      message: 'Please provide a reason for rejection (Required):',
+      placeholder: 'Enter rejection reason...',
+      type: 'warning',
+      confirmText: 'Reject',
+      cancelText: 'Cancel'
+    }).subscribe(reason => {
+      if (reason && reason.trim().length > 0) {
+        this.updateStatus(id, ClaimStatus.REJECTED, reason);
+      }
+    });
   }
 
   handleView(id: number) {
@@ -57,14 +73,16 @@ export class ClaimsOfficerDashboard {
   }
 
   private updateStatus(id: number, status: ClaimStatus, reason?: string) {
-    // Assuming updateClaimStatus exists in your Claim Service
-    // If not, we'll need to add it to src/app/core/services/claim/claim.ts
     this.claimService.updateClaimStatus(id, { status, rejectionReason: reason }).subscribe({
       next: () => {
-        this.refresh(); // Refresh list to reflect changes
-        // Optional: Show toast notification
+        this.refresh();
+        this.dialogService.success(
+          status === ClaimStatus.APPROVED ? 'Claim Approved Successfully' : 'Claim Rejected'
+        );
       },
-      error: (err) => alert('Action Failed: ' + (err.error?.message || 'Unknown Error')),
+      error: (err) => {
+        this.dialogService.error('Action Failed: ' + (err.error?.message || 'Unknown Error'));
+      },
     });
   }
 }

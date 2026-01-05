@@ -6,6 +6,7 @@ import { Policy } from '../../../../core/services/policy/policy';
 import { Auth } from '../../../../core/services/auth/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IInsurancePlan, IPolicyEnrollmentRequest } from '../../../../core/models/policy.model';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-new-sale',
@@ -18,6 +19,7 @@ export class NewSale {
   private policyService = inject(Policy);
   private auth = inject(Auth);
   private router = inject(Router);
+  private dialogService = inject(Dialog);
 
   // Simple email input for customer
   customerEmail = signal<string>('');
@@ -50,24 +52,33 @@ export class NewSale {
           return;
         }
 
-        if (confirm(`Enroll ${user.name || email} into ${plan.name}?`)) {
+        this.dialogService.confirm({
+          title: 'Confirm Enrollment',
+          message: `Enroll ${user.name || email} into ${plan.name}?`,
+          type: 'info',
+          confirmText: 'Enroll',
+          cancelText: 'Cancel'
+        }).subscribe(confirmed => {
+          if (!confirmed) return;
+
           const request: IPolicyEnrollmentRequest = {
-            userId: user.id,
+            userId: user.id!,
             planId: plan.id!,
             agentId: agentId,
           };
 
           this.policyService.enrollPolicy(request).subscribe({
             next: () => {
-              alert('Policy Sold Successfully!');
-              this.customerEmail.set('');
-              this.router.navigate(['/agent/dashboard']);
+              this.dialogService.success('Policy Sold Successfully!').subscribe(() => {
+                this.customerEmail.set('');
+                this.router.navigate(['/agent/dashboard']);
+              });
             },
             error: (err) => {
               this.errorMessage.set('Enrollment Failed: ' + (err.error?.message || err.message));
             },
           });
-        }
+        });
       },
       error: () => {
         this.errorMessage.set('Customer not found with this email.');

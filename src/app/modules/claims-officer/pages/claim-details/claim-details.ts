@@ -7,17 +7,20 @@ import { Hospital } from '../../../../core/services/hospital/hospital';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs';
 import { ClaimStatus } from '../../../../core/models/claim.model';
+import { Dialog } from '../../../../core/services/dialog/dialog';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-claim-details',
   standalone:true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule, CurrencyPipe, FormsModule],
   templateUrl: './claim-details.html',
   styleUrl: './claim-details.css',
 })
 export class ClaimDetails {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialogService = inject(Dialog);
   
   private claimService = inject(Claim);
   private policyService = inject(Policy);
@@ -61,24 +64,46 @@ export class ClaimDetails {
 
   handleApprove() {
     const id = this.claim()?.id;
-    if (id && confirm('Approve this claim?')) {
+    if (!id) return;
+    
+    this.dialogService.confirm({
+      title: 'Approve Claim',
+      message: 'Are you sure you want to approve this claim?',
+      type: 'success',
+      confirmText: 'Approve',
+      cancelText: 'Cancel'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      
       this.claimService.updateClaimStatus(id, { status: ClaimStatus.APPROVED })
         .subscribe(() => {
-          alert('Claim Approved');
-          this.goBack();
+          this.dialogService.success('Claim Approved').subscribe(() => {
+            this.goBack();
+          });
         });
-    }
+    });
   }
 
   handleReject() {
     const id = this.claim()?.id;
-    const reason = prompt('Rejection Reason:');
-    if (id && reason) {
+    if (!id) return;
+    
+    this.dialogService.prompt({
+      title: 'Reject Claim',
+      message: 'Please provide a reason for rejecting this claim:',
+      placeholder: 'Enter rejection reason...',
+      type: 'warning',
+      confirmText: 'Reject',
+      cancelText: 'Cancel'
+    }).subscribe(reason => {
+      if (!reason || !reason.trim()) return;
+      
       this.claimService.updateClaimStatus(id, { status: ClaimStatus.REJECTED, rejectionReason: reason })
         .subscribe(() => {
-          alert('Claim Rejected');
-          this.goBack();
+          this.dialogService.success('Claim Rejected').subscribe(() => {
+            this.goBack();
+          });
         });
-    }
+    });
   }
 }

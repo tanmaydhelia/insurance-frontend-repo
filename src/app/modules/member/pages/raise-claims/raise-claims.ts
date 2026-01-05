@@ -7,6 +7,7 @@ import { map, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IClaimRequest, SubmissionSource } from '../../../../core/models/claim.model';
 import { ClaimForm } from '../../../../shared/components/claim-form/claim-form';
+import { Dialog } from '../../../../core/services/dialog/dialog';
 
 @Component({
   selector: 'app-raise-claims',
@@ -20,6 +21,7 @@ export class RaiseClaims {
   private router = inject(Router);
   private policyService = inject(Policy);
   private claimService = inject(Claim);
+  private dialogService = inject(Dialog);
 
   isSubmitting = false;
 
@@ -54,12 +56,13 @@ export class RaiseClaims {
 
     process$.subscribe({
       next: () => {
-        alert('Claim Submitted Successfully!');
-        this.router.navigate(['/member/dashboard']);
+        this.dialogService.success('Claim Submitted Successfully!').subscribe(() => {
+          this.router.navigate(['/member/dashboard']);
+        });
       },
       error: (err) => {
         this.isSubmitting = false;
-        alert('Failed to submit claim: ' + (err.error?.message || err.message));
+        this.dialogService.error('Failed to submit claim: ' + (err.error?.message || err.message));
       },
     });
   }
