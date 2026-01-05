@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Footer } from './components/footer/footer';
 import { Sidebar } from './components/sidebar/sidebar';
+import { DocumentUpload } from './components/document-upload/document-upload';
 
 
 
@@ -19,7 +20,8 @@ import { Sidebar } from './components/sidebar/sidebar';
     Header,
     Footer,
     Sidebar,
-    HasRole
+    HasRole,
+    DocumentUpload
   ],
   exports: [
     CommonModule,
@@ -29,7 +31,8 @@ import { Sidebar } from './components/sidebar/sidebar';
     Header,
     Footer,
     Sidebar,
-    HasRole
+    HasRole,
+    DocumentUpload
   ]
 })
 export class SharedModule { }

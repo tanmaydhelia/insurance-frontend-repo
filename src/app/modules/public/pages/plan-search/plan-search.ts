@@ -1,18 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlanCard } from '../../container/plan-card/plan-card';
 import { IPolicyEnrollmentRequest } from '../../../../core/models/policy.model';
 import { Policy } from '../../../../core/services/policy/policy';
 import { Auth } from '../../../../core/services/auth/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { Dialog } from '../../../../core/services/dialog/dialog';
+import { MemberDocument } from '../../../../core/services/member-document/member-document';
+import { DocumentUpload } from '../../../../shared/components/document-upload/document-upload';
 
 @Component({
   selector: 'app-plan-search',
   standalone:true,
-  imports: [CommonModule, RouterModule, PlanCard],
+  imports: [CommonModule, RouterModule, PlanCard, DocumentUpload],
   templateUrl: './plan-search.html',
   styleUrl: './plan-search.css',
 })
@@ -21,6 +23,12 @@ export class PlanSearch {
   private authService = inject(Auth);
   private router = inject(Router);
   private dialogService = inject(Dialog);
+  private memberDocService = inject(MemberDocument);
+
+  // State for document upload modal
+  showDocumentUpload = signal(false);
+  pendingPlanId = signal<number | null>(null);
+  currentUserId = signal<number | null>(null);
 
   // Fetch plans via Signal
   plans = toSignal(
@@ -51,6 +59,44 @@ export class PlanSearch {
       return;
     }
 
+    this.currentUserId.set(userId);
+
+    // Check if documents exist before enrollment
+    this.memberDocService.checkDocumentsExist(userId).subscribe({
+      next: (response) => {
+        if (response.exists) {
+          // Documents exist, proceed with enrollment
+          this.proceedWithEnrollment(planId, userId);
+        } else {
+          // Documents don't exist, show upload modal
+          this.pendingPlanId.set(planId);
+          this.showDocumentUpload.set(true);
+        }
+      },
+      error: () => {
+        // If check fails, show upload modal to be safe
+        this.pendingPlanId.set(planId);
+        this.showDocumentUpload.set(true);
+      }
+    });
+  }
+
+  onDocumentsSubmitted() {
+    this.showDocumentUpload.set(false);
+    const planId = this.pendingPlanId();
+    const userId = this.currentUserId();
+    
+    if (planId && userId) {
+      this.proceedWithEnrollment(planId, userId);
+    }
+  }
+
+  onDocumentUploadCancel() {
+    this.showDocumentUpload.set(false);
+    this.pendingPlanId.set(null);
+  }
+
+  private proceedWithEnrollment(planId: number, userId: number) {
     // Confirm purchase
     this.dialogService.confirm({
       title: 'Confirm Purchase',

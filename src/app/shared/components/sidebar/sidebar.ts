@@ -32,6 +32,7 @@ export class Sidebar {
     { label: 'Dashboard', icon: 'pi pi-home', route: '/member/dashboard' },
     { label: 'My Policies', icon: 'pi pi-file-check', route: '/member/policies' },
     { label: 'My Claims', icon: 'pi pi-file-edit', route: '/member/claims' },
+    { label: 'My Documents', icon: 'pi pi-id-card', route: '/member/documents' },
     { label: 'Raise Claim', icon: 'pi pi-plus-circle', route: '/public/search' },
     { label: 'Analytics', icon: 'pi pi-chart-bar', route: '/member/analytics' },
     { label: 'Profile', icon: 'pi pi-user', route: '/member/profile' },

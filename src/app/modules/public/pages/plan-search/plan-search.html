@@ -35,3 +35,40 @@
     }
   </div>
 </div>
+
+<!-- Document Upload Modal -->
+@if (showDocumentUpload()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="onDocumentUploadCancel()"></div>
+    
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Document Verification Required</h2>
+            <p class="text-sm text-gray-500 mt-1">Please upload your documents to proceed with enrollment</p>
+          </div>
+          <button 
+            (click)="onDocumentUploadCancel()"
+            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            <i class="pi pi-times text-lg"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        @if (currentUserId()) {
+          <app-document-upload 
+            [userId]="currentUserId()!"
+            (onSuccess)="onDocumentsSubmitted()"
+            (onCancel)="onDocumentUploadCancel()">
+          </app-document-upload>
+        }
+      </div>
+    </div>
+  </div>
+}

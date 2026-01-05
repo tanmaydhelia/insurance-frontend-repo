@@ -4,11 +4,13 @@ import { MemberDashboard } from './pages/member-dashboard/member-dashboard';
 import { RaiseClaims } from './pages/raise-claims/raise-claims';
 import { ClaimHistory } from './pages/claim-history/claim-history';
 import { MemberAnalytics } from './pages/member-analytics/member-analytics';
+import { MemberDocuments } from './pages/member-documents/member-documents';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: MemberDashboard },
   { path: 'analytics', component: MemberAnalytics },
+  { path: 'documents', component: MemberDocuments },
   { path: 'claim/new/:id', component: RaiseClaims },
   { path: 'claims', component: ClaimHistory }
 ];
