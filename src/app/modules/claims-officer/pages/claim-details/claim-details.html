@@ -1,0 +1,142 @@
+<div class="min-h-screen bg-gray-50 pb-12">
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <button
+        (click)="goBack()"
+        class="mb-4 text-sm text-gray-500 hover:text-gray-900 flex items-center"
+      >
+        <i class="pi pi-arrow-left mr-1"></i> Back to Dashboard
+      </button>
+
+      <div class="md:flex md:items-center md:justify-between">
+        <div class="min-w-0 flex-1">
+          <h2
+            class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+          >
+            Claim #{{ claim()?.id }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Submitted on {{ claim()?.date || 'N/A' }} via {{ claim()?.submissionSource }}
+          </p>
+        </div>
+        <div class="mt-4 flex md:ml-4 md:mt-0 gap-3">
+          @if (claim()?.status === 'SUBMITTED' || claim()?.status === 'IN_REVIEW') {
+          <button
+            (click)="handleReject()"
+            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-600 shadow-sm ring-1 ring-inset ring-red-300 hover:bg-red-50"
+          >
+            Reject Claim
+          </button>
+          <button
+            (click)="handleApprove()"
+            class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          >
+            Approve Claim
+          </button>
+          } @else {
+          <span
+            class="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium ring-1 ring-inset"
+            [ngClass]="
+              claim()?.status === 'APPROVED'
+                ? 'bg-green-50 text-green-700 ring-green-600/20'
+                : 'bg-red-50 text-red-700 ring-red-600/20'
+            "
+          >
+            {{ claim()?.status }}
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white shadow sm:rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Claim Details</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Diagnosis</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ claim()?.diagnosis }}</dd>
+              </div>
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Claim Amount</dt>
+                <dd class="mt-1 text-xl font-bold text-gray-900">
+                  {{ claim()?.claimAmount | currency : 'INR' }}
+                </dd>
+              </div>
+
+              <div class="sm:col-span-2">
+                <dt class="text-sm font-medium text-gray-500 mb-2">Supporting Documents</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  @if (claim()?.documentUrl) {
+                  <div
+                    class="border border-gray-200 rounded-md p-4 flex items-center justify-between bg-gray-50"
+                  >
+                    <div class="flex items-center">
+                      <i class="pi pi-file-pdf text-red-500 text-2xl mr-3"></i>
+                      <div>
+                        <p class="font-medium text-gray-900">Medical_Report.pdf</p>
+                        <p class="text-xs text-gray-500">Uploaded Evidence</p>
+                      </div>
+                    </div>
+                    <a
+                      [href]="claim()?.documentUrl"
+                      target="_blank"
+                      class="text-indigo-600 hover:text-indigo-500 font-medium text-sm flex items-center"
+                    >
+                      View Document <i class="pi pi-external-link ml-1"></i>
+                    </a>
+                  </div>
+                  } @else {
+                  <p class="text-gray-500 italic">No documents uploaded.</p>
+                  }
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white shadow sm:rounded-lg overflow-hidden border-t-4 border-indigo-500">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Member Information</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6 bg-gray-50">
+            @if (policy(); as pol) {
+            <p class="text-sm text-gray-500">Policy Number</p>
+            <p class="text-md font-bold text-gray-900 mb-4">#{{ pol.policyNumber }}</p>
+
+            <p class="text-sm text-gray-500">Plan</p>
+            <p class="text-sm font-medium text-gray-900 mb-4">{{ pol.plan?.name }}</p>
+
+            <p class="text-sm text-gray-500">Member ID</p>
+            <p class="text-sm font-medium text-gray-900">{{ pol.userId || 'Unknown' }}</p>
+            } @else {
+            <i class="pi pi-spin pi-spinner"></i> Loading Member Info... }
+          </div>
+        </div>
+
+        @if (hospital(); as hosp) {
+        <div class="bg-white shadow sm:rounded-lg overflow-hidden border-t-4 border-green-500">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Treating Provider</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6 bg-gray-50">
+            <p class="text-lg font-bold text-gray-900">{{ hosp.name }}</p>
+            <p class="text-sm text-gray-600 mt-1">{{ hosp.address }}</p>
+            <div class="mt-3 flex items-center text-sm text-gray-500">
+              <i class="pi pi-phone mr-2"></i> {{ hosp.contactNumber }}
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </main>
+</div>

@@ -17,6 +17,7 @@ export class ClaimsTable {
   claims = input.required<IClaim[]>();
   onApprove = output<number>();
   onReject = output<number>();
+  onView = output<number>();
 
   private policyMapSignal = signal<Map<number, IPolicy>>(new Map());
   

@@ -79,6 +79,12 @@
         <td
           class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
         >
+          <button
+            (click)="onView.emit(claim.id)"
+            class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs uppercase tracking-wide mr-4"
+          >
+            View Details
+          </button>
           @if (claim.status === 'SUBMITTED' || claim.status === 'IN_REVIEW') {
           <div class="flex justify-end gap-2">
             <button

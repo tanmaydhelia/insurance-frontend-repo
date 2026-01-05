@@ -46,6 +46,7 @@
     } @else {
     <app-claims-table
       [claims]="claims() || []"
+      (onView)="handleView($event)"
       (onApprove)="handleApprove($event)"
       (onReject)="handleReject($event)"
     >
