@@ -1,20 +1,28 @@
-<div class="h-screen flex font-sans text-gray-800 overflow-hidden">
-  <!-- Sidebar Component (only shows when logged in) -->
-  <app-sidebar></app-sidebar>
-  
-  <!-- Main Content Wrapper -->
-  <div class="flex-1 flex flex-col min-w-0 overflow-auto">
-    <div>
-      <app-header (click)="toggleSidebar()"></app-header>
-      
-      <main class="flex-1 bg-gray-50 w-full overflow-y-auto overflow-auto">
-        <div class="max-w-7xl mx-auto w-full p-6">
-          <router-outlet></router-outlet>
-        </div>
-      </main>
-        
-    </div>
-
-    <app-footer></app-footer>
+@if (isFullWidthPage()) {
+  <!-- Full Width Layout (Landing, Auth pages) -->
+  <div class="min-h-screen w-full">
+    <router-outlet></router-outlet>
   </div>
-</div>
+} @else {
+  <!-- Standard Layout with Header, Sidebar, Footer -->
+  <div class="h-screen flex font-sans text-gray-800 overflow-hidden">
+    <!-- Sidebar Component (only shows when logged in) -->
+    <app-sidebar></app-sidebar>
+    
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-auto">
+      <div>
+        <app-header (click)="toggleSidebar()"></app-header>
+        
+        <main class="flex-1 bg-gray-50 w-full overflow-y-auto overflow-auto">
+          <div class="max-w-7xl mx-auto w-full p-6">
+            <router-outlet></router-outlet>
+          </div>
+        </main>
+          
+      </div>
+
+      <app-footer></app-footer>
+    </div>
+  </div>
+}

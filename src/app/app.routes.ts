@@ -3,12 +3,12 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { ERole } from './core/models/user.model';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized';
+import { LandingComponent } from './shared/components/landing/landing';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth/login',
-    pathMatch: 'full'
+    component: LandingComponent
   },
 
   {
