@@ -8,6 +8,7 @@ import { IPolicy } from '../../../../core/models/policy.model';
 import { IClaimRequest, SubmissionSource } from '../../../../core/models/claim.model';
 import { ClaimForm } from '../../../../shared/components/claim-form/claim-form';
 import { HospitalSelector } from '../../container/hospital-selector/hospital-selector';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-provider-submit-claim',
@@ -36,7 +37,7 @@ export class ProviderSubmitClaim {
     this.hospitalId.set(id as number);
   }
 
-  handleSubmit(formData: any) {
+  handleSubmit(event: { formValues: any, file: File | null }) {
     const policy = this.verifiedPolicy();
     const hospId = this.hospitalId();
 
@@ -49,19 +50,28 @@ export class ProviderSubmitClaim {
     const request: IClaimRequest = {
       policyId: policy.id,
       hospitalId: hospId,
-      diagnosis: formData.diagnosis,
-      claimAmount: formData.claimAmount,
+      diagnosis: event.formValues.diagnosis,
+      claimAmount: event.formValues.claimAmount,
       submissionSource: SubmissionSource.PROVIDER,
     };
 
-    this.claimService.submitClaim(request).subscribe({
+    const process$ = event.file
+      ? this.claimService.uploadDocument(event.file).pipe(
+          switchMap((response) => {
+            request.documentUrl = response.url;
+            return this.claimService.submitClaim(request);
+          })
+        )
+      : this.claimService.submitClaim(request);
+
+    process$.subscribe({
       next: () => {
         alert('Claim Submitted Successfully!');
         this.router.navigate(['/']);
       },
       error: (err) => {
         this.isSubmitting = false;
-        alert('Error: ' + err.message);
+        alert('Failed to submit claim: ' + (err.error?.message || err.message));
       },
     });
   }

@@ -24,18 +24,12 @@ export class RaiseClaims {
   isSubmitting = false;
 
   // 1. Get ID from URL
-  private policyId$ = this.route.paramMap.pipe(
-    map(params => Number(params.get('id')))
-  );
+  private policyId$ = this.route.paramMap.pipe(map((params) => Number(params.get('id'))));
 
   // 2. Fetch Policy Context
-  policy = toSignal(
-    this.policyId$.pipe(
-      switchMap(id => this.policyService.getPolicyById(id))
-    )
-  );
+  policy = toSignal(this.policyId$.pipe(switchMap((id) => this.policyService.getPolicyById(id))));
 
-  handleSubmit(formData: any) {
+  handleSubmit(event: { formValues: any; file: File | null }) {
     const currentPolicy = this.policy();
     if (!currentPolicy) return;
 
@@ -43,21 +37,30 @@ export class RaiseClaims {
 
     const request: IClaimRequest = {
       policyId: currentPolicy.id,
-      diagnosis: formData.diagnosis,
-      claimAmount: formData.claimAmount,
+      diagnosis: event.formValues.diagnosis,
+      claimAmount: event.formValues.claimAmount,
       submissionSource: SubmissionSource.MEMBER,
       // hospitalId: optional, skipped for direct member reimbursement
     };
 
-    this.claimService.submitClaim(request).subscribe({
+    const process$ = event.file
+      ? this.claimService.uploadDocument(event.file).pipe(
+          switchMap((response) => {
+            request.documentUrl = response.url;
+            return this.claimService.submitClaim(request);
+          })
+        )
+      : this.claimService.submitClaim(request);
+
+    process$.subscribe({
       next: () => {
         alert('Claim Submitted Successfully!');
         this.router.navigate(['/member/dashboard']);
       },
       error: (err) => {
         this.isSubmitting = false;
-        alert('Failed to submit claim: ' + err.message);
-      }
+        alert('Failed to submit claim: ' + (err.error?.message || err.message));
+      },
     });
   }
 

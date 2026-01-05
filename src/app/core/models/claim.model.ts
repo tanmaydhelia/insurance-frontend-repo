@@ -19,6 +19,7 @@ export interface IClaim {
   status: ClaimStatus;
   submissionSource: SubmissionSource;
   rejectionReason?: string;
+  documentUrl?: string;
   date: string;
 }
 
@@ -28,6 +29,7 @@ export interface IClaimRequest {
   diagnosis: string;
   claimAmount: number;
   hospitalId?: number;
+  documentUrl?: string;
   submissionSource: SubmissionSource;
 }
 

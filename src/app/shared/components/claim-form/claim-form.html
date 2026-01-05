@@ -37,22 +37,28 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium text-gray-700">Medical Bills (PDF)</label>
+    <label class="block text-sm font-medium text-gray-700">Medical Bills / Reports</label>
     <div
-      class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+      class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors"
     >
       <div class="space-y-1 text-center">
-        <i class="pi pi-file text-gray-400 text-3xl"></i>
-        <div class="flex text-sm text-gray-600">
+        <i class="pi pi-cloud-upload text-gray-400 text-3xl"></i>
+        <div class="flex text-sm text-gray-600 justify-center">
           <label
-            class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+            for="file-upload"
+            class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
           >
-            <span>Upload a file</span>
-            <input type="file" class="sr-only" />
+            <span>{{ selectedFileName() || 'Upload a file' }}</span>
+            <input
+              id="file-upload"
+              name="file-upload"
+              type="file"
+              class="sr-only"
+              (change)="onFileSelected($event)"
+            />
           </label>
-          <p class="pl-1">or drag and drop</p>
         </div>
-        <p class="text-xs text-gray-500">PDF up to 5MB</p>
+        <p class="text-xs text-gray-500">PNG, JPG, PDF up to 5MB</p>
       </div>
     </div>
   </div>

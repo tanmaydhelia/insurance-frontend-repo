@@ -15,6 +15,12 @@ export class Claim {
     return this.api.post<IClaim>(`${this.BASE_PATH}/submit`, request);
   }
 
+  uploadDocument(file: File): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.api.post<{ url: string }>(`${this.BASE_PATH}/upload`, formData);
+  }
+
   getClaimById(id: number): Observable<IClaim> {
     return this.api.get<IClaim>(`${this.BASE_PATH}/${id}`);
   }
@@ -29,6 +35,10 @@ export class Claim {
 
   getOpenClaims(): Observable<IClaim[]> {
     return this.api.get<IClaim[]>(`${this.BASE_PATH}/open`);
+  }
+
+  getAllClaims(): Observable<IClaim[]> {
+    return this.getOpenClaims();
   }
 
   updateClaimStatus(id: number, statusDto: IClaimStatusUpdate): Observable<IClaim> {
