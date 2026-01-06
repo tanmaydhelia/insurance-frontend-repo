@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlanCard } from '../../container/plan-card/plan-card';
-import { IPolicyEnrollmentRequest } from '../../../../core/models/policy.model';
+import { IInsurancePlan, IPolicyEnrollmentRequest } from '../../../../core/models/policy.model';
 import { Policy } from '../../../../core/services/policy/policy';
 import { Auth } from '../../../../core/services/auth/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -10,11 +10,12 @@ import { catchError, of, switchMap } from 'rxjs';
 import { Dialog } from '../../../../core/services/dialog/dialog';
 import { MemberDocument } from '../../../../core/services/member-document/member-document';
 import { DocumentUpload } from '../../../../shared/components/document-upload/document-upload';
+import { PaymentCheckout } from '../../../../shared/components/payment-checkout/payment-checkout';
 
 @Component({
   selector: 'app-plan-search',
   standalone:true,
-  imports: [CommonModule, RouterModule, PlanCard, DocumentUpload],
+  imports: [CommonModule, RouterModule, PlanCard, DocumentUpload, PaymentCheckout],
   templateUrl: './plan-search.html',
   styleUrl: './plan-search.css',
 })
@@ -29,6 +30,10 @@ export class PlanSearch {
   showDocumentUpload = signal(false);
   pendingPlanId = signal<number | null>(null);
   currentUserId = signal<number | null>(null);
+
+  // State for payment modal
+  showPaymentModal = signal(false);
+  selectedPlan = signal<IInsurancePlan | null>(null);
 
   // Fetch plans via Signal
   plans = toSignal(
@@ -97,31 +102,54 @@ export class PlanSearch {
   }
 
   private proceedWithEnrollment(planId: number, userId: number) {
-    // Confirm purchase
-    this.dialogService.confirm({
-      title: 'Confirm Purchase',
-      message: 'Confirm purchase of this plan? (Mock Payment)',
-      type: 'info',
-      confirmText: 'Purchase',
-      cancelText: 'Cancel'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
+    // Find the selected plan
+    const plans = this.plans();
+    const plan = plans?.find(p => p.id === planId);
+    
+    if (!plan) {
+      this.dialogService.error('Plan not found. Please try again.');
+      return;
+    }
 
-      const request: IPolicyEnrollmentRequest = {
-        userId: userId,
-        planId: planId
-      };
+    // Show payment modal
+    this.selectedPlan.set(plan);
+    this.showPaymentModal.set(true);
+  }
 
-      this.policyService.enrollPolicy(request).subscribe({
-        next: () => {
-          this.dialogService.success('Enrollment Successful! Redirecting to Dashboard.').subscribe(() => {
-            this.router.navigate(['/member/dashboard']);
-          });
-        },
-        error: (err) => {
-          this.dialogService.error('Enrollment Failed: ' + (err.error?.message || 'Unknown Error'));
-        }
-      });
+  onPaymentSuccess() {
+    const plan = this.selectedPlan();
+    const userId = this.currentUserId();
+    
+    if (!plan?.id || !userId) {
+      this.dialogService.error('Unable to complete enrollment. Please try again.');
+      return;
+    }
+
+    this.showPaymentModal.set(false);
+
+    const request: IPolicyEnrollmentRequest = {
+      userId: userId,
+      planId: plan.id
+    };
+
+    this.policyService.enrollPolicy(request).subscribe({
+      next: () => {
+        this.dialogService.success('Enrollment Successful! Redirecting to Dashboard.').subscribe(() => {
+          this.router.navigate(['/member/dashboard']);
+        });
+      },
+      error: (err) => {
+        this.dialogService.error('Enrollment Failed: ' + (err.error?.message || 'Unknown Error'));
+      }
     });
+  }
+
+  onPaymentCancel() {
+    this.showPaymentModal.set(false);
+    this.selectedPlan.set(null);
+  }
+
+  onPaymentError(message: string) {
+    this.dialogService.error(message);
   }
 }

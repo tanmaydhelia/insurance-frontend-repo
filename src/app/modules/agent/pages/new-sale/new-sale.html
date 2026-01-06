@@ -231,3 +231,42 @@
     </div>
   </div>
 }
+
+<!-- Payment Modal -->
+@if (showPaymentModal() && pendingPlan() && pendingCustomer()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="onPaymentCancel()"></div>
+    
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-linear-to-r from-indigo-500 to-purple-600 px-6 py-5">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-lg">
+            <i class="pi pi-credit-card text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-white">Complete Payment</h2>
+            <p class="text-indigo-100 text-sm">
+              Processing payment for {{ pendingCustomer()?.name || pendingCustomer()?.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        <app-payment-checkout
+          [plan]="pendingPlan()!"
+          [userId]="pendingCustomer()!.id!"
+          [userName]="pendingCustomer()?.name"
+          [userEmail]="pendingCustomer()?.email"
+          (onSuccess)="onPaymentSuccess()"
+          (onCancel)="onPaymentCancel()"
+          (onError)="onPaymentError($event)">
+        </app-payment-checkout>
+      </div>
+    </div>
+  </div>
+}

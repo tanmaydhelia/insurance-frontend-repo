@@ -67,4 +67,11 @@ export class Claim {
   pickupClaim(id: number): Observable<IClaim> {
     return this.updateClaimStatus(id, { status: ClaimStatus.IN_REVIEW });
   }
+
+  /**
+   * Get all claims raised against policies sold by a specific agent
+   */
+  getAgentClaims(agentId: number): Observable<IClaim[]> {
+    return this.api.get<IClaim[]>(`${this.BASE_PATH}/agent/${agentId}`);
+  }
 }

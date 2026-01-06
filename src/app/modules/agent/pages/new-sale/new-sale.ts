@@ -11,11 +11,12 @@ import { MemberDocument } from '../../../../core/services/member-document/member
 import { DocumentUpload } from '../../../../shared/components/document-upload/document-upload';
 import { ERole, IUser } from '../../../../core/models/user.model';
 import { FormsModule } from '@angular/forms';
+import { PaymentCheckout } from '../../../../shared/components/payment-checkout/payment-checkout';
 
 @Component({
   selector: 'app-new-sale',
   standalone:true,
-  imports: [CommonModule, RouterModule, AgentPlanTable, DocumentUpload, FormsModule],
+  imports: [CommonModule, RouterModule, AgentPlanTable, DocumentUpload, FormsModule, PaymentCheckout],
   templateUrl: './new-sale.html',
   styleUrl: './new-sale.css',
 })
@@ -44,6 +45,9 @@ export class NewSale {
     email: '',
     password: ''
   });
+
+  // Payment modal state
+  showPaymentModal = signal(false);
 
   // Load plans immediately
   plans = toSignal(this.policyService.getAllPlans());
@@ -208,32 +212,63 @@ export class NewSale {
   }
 
   private proceedWithEnrollment(user: IUser, plan: IInsurancePlan, agentId: number) {
-    this.dialogService.confirm({
-      title: 'Confirm Enrollment',
-      message: `Enroll ${user.name || user.email} into ${plan.name}?`,
-      type: 'info',
-      confirmText: 'Enroll',
-      cancelText: 'Cancel'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
+    // Store customer and plan for payment flow
+    this.pendingCustomer.set(user);
+    this.pendingPlan.set(plan);
+    
+    // Show payment modal instead of direct enrollment
+    this.showPaymentModal.set(true);
+  }
 
-      const request: IPolicyEnrollmentRequest = {
-        userId: user.id!,
-        planId: plan.id!,
-        agentId: agentId,
-      };
+  onPaymentSuccess() {
+    this.showPaymentModal.set(false);
+    
+    const customer = this.pendingCustomer();
+    const plan = this.pendingPlan();
+    const agentId = this.auth.getUserId();
+    
+    if (!customer || !plan || !agentId) {
+      this.errorMessage.set('Unable to complete enrollment. Please try again.');
+      return;
+    }
 
-      this.policyService.enrollPolicy(request).subscribe({
-        next: () => {
-          this.dialogService.success('Policy Sold Successfully!').subscribe(() => {
-            this.customerEmail.set('');
-            this.router.navigate(['/agent/dashboard']);
-          });
-        },
-        error: (err) => {
-          this.errorMessage.set('Enrollment Failed: ' + (err.error?.message || err.message));
-        },
-      });
+    const request: IPolicyEnrollmentRequest = {
+      userId: customer.id!,
+      planId: plan.id!,
+      agentId: agentId,
+    };
+
+    this.policyService.enrollPolicy(request).subscribe({
+      next: () => {
+        this.dialogService.success('Policy Sold Successfully!').subscribe(() => {
+          this.customerEmail.set('');
+          this.pendingCustomer.set(null);
+          this.pendingPlan.set(null);
+          this.router.navigate(['/agent/dashboard']);
+        });
+      },
+      error: (err) => {
+        this.errorMessage.set('Enrollment Failed: ' + (err.error?.message || err.message));
+      },
+    });
+  }
+
+  onPaymentCancel() {
+    this.showPaymentModal.set(false);
+    this.dialogService.alert({
+      title: 'Payment Cancelled',
+      message: 'The payment was cancelled. You can try again when ready.',
+      type: 'warning'
+    });
+  }
+
+  onPaymentError(message: string) {
+    this.showPaymentModal.set(false);
+    this.errorMessage.set(message);
+    this.dialogService.alert({
+      title: 'Payment Failed',
+      message: message,
+      type: 'error'
     });
   }
 }

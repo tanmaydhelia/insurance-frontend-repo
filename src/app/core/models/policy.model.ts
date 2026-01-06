@@ -25,6 +25,9 @@ export interface IPolicy {
   insurancePlan?: IInsurancePlan;
   remainingSumInsured?: number;  // Remaining coverage after claims
   coverageAmount?: number;       // Total coverage amount from plan
+  // User info (populated by backend for agent views)
+  userName?: string;
+  userEmail?: string;
 }
 
 export interface IPlanRequest {

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 py-8">
+  <div class="min-h-screen bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="md:flex md:items-center md:justify-between mb-8">
       <div class="min-w-0 flex-1">
@@ -8,7 +8,21 @@
           Agent Portal
         </h2>
       </div>
-      <div class="mt-4 flex md:ml-4 md:mt-0">
+      <div class="mt-4 flex md:ml-4 md:mt-0 gap-3">
+        <a
+          routerLink="/agent/customers"
+          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all"
+        >
+          <i class="pi pi-users mr-2"></i>
+          My Customers
+        </a>
+        <a
+          routerLink="/agent/analytics"
+          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all"
+        >
+          <i class="pi pi-chart-bar mr-2"></i>
+          Analytics
+        </a>
         <a
           routerLink="/agent/sale/new"
           class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"

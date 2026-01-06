@@ -1,0 +1,131 @@
+<div class="space-y-6">
+  <!-- Plan Summary -->
+  <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="p-3 bg-indigo-100 rounded-lg">
+        <i class="pi pi-shield text-2xl text-indigo-600"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">{{ plan.name }}</h3>
+        <p class="text-sm text-gray-500">{{ plan.description }}</p>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+      <div>
+        <p class="text-xs text-gray-500 uppercase">Coverage</p>
+        <p class="text-lg font-bold text-gray-900">{{ plan.coverageAmount | currency:'INR':'symbol':'1.0-0' }}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-500 uppercase">Premium</p>
+        <p class="text-lg font-bold text-indigo-600">{{ plan.basePremium | currency:'INR':'symbol':'1.0-0' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Status -->
+  @switch (paymentStatus()) {
+    @case ('idle') {
+      <!-- Payment Info -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <i class="pi pi-info-circle text-blue-600 mt-0.5"></i>
+          <div class="text-sm text-blue-700">
+            <p class="font-medium mb-1">Secure Payment via Razorpay</p>
+            <p class="text-blue-600">
+              You will be redirected to Razorpay's secure payment page. 
+              We accept UPI, Credit/Debit Cards, Net Banking, and Wallets.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Amount -->
+      <div class="bg-white border border-gray-200 rounded-xl p-5">
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-gray-600">Plan Premium</span>
+          <span class="text-gray-900">{{ plan.basePremium | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-gray-600">GST (18%)</span>
+          <span class="text-gray-900">{{ plan.basePremium * 0.18 | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
+          <span class="text-lg font-semibold text-gray-900">Total Amount</span>
+          <span class="text-2xl font-bold text-indigo-600">{{ plan.basePremium * 1.18 | currency:'INR':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-4">
+        <button
+          (click)="cancel()"
+          class="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button
+          (click)="initiatePayment()"
+          class="flex-1 px-6 py-3 bg-linear-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+          <i class="pi pi-credit-card"></i>
+          Pay {{ plan.basePremium * 1.18 | currency:'INR':'symbol':'1.0-0' }}
+        </button>
+      </div>
+    }
+
+    @case ('processing') {
+      <!-- Processing State -->
+      <div class="text-center py-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+          <i class="pi pi-spin pi-spinner text-3xl text-indigo-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Processing Payment</h3>
+        <p class="text-gray-500">Please complete the payment in the Razorpay window...</p>
+        <p class="text-sm text-gray-400 mt-4">Do not close this window</p>
+      </div>
+    }
+
+    @case ('success') {
+      <!-- Success State -->
+      <div class="text-center py-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+          <i class="pi pi-check text-3xl text-green-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-green-600 mb-2">Payment Successful!</h3>
+        <p class="text-gray-500">Your payment has been verified. Proceeding with enrollment...</p>
+      </div>
+    }
+
+    @case ('failed') {
+      <!-- Failed State -->
+      <div class="text-center py-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+          <i class="pi pi-times text-3xl text-red-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-red-600 mb-2">Payment Failed</h3>
+        <p class="text-gray-500 mb-2">{{ errorMessage() || 'Something went wrong with your payment.' }}</p>
+        
+        <div class="flex gap-4 mt-6 justify-center">
+          <button
+            (click)="cancel()"
+            class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            (click)="retry()"
+            class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2">
+            <i class="pi pi-refresh"></i>
+            Try Again
+          </button>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Secure Payment Badge -->
+  @if (paymentStatus() === 'idle') {
+    <div class="flex items-center justify-center gap-2 text-gray-400 text-sm">
+      <i class="pi pi-lock"></i>
+      <span>Secured by Razorpay</span>
+    </div>
+  }
+</div>
