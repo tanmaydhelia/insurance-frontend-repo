@@ -13,6 +13,23 @@ export interface IUser {
   email: string;
   password?: string; 
   role: ERole;
+  active?: boolean;  // Account status (true=active, false=suspended)
+}
+
+// Request to create a staff user via admin
+export interface ICreateStaffRequest {
+  name: string;
+  email: string;
+  password: string;
+  role: ERole;
+}
+
+// Request to update user details
+export interface IUpdateUserRequest {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: ERole;
 }
 
 export interface IAuthRequest {

@@ -1,0 +1,564 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
+        <p class="text-gray-500 mt-1">Manage staff accounts and permissions</p>
+      </div>
+      <button 
+        (click)="openCreateModal()"
+        class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl">
+        <i class="pi pi-user-plus"></i>
+        Add Staff User
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- Total Users -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-blue-100 rounded-lg">
+            <i class="pi pi-users text-xl text-blue-600"></i>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900">{{ totalUsers() }}</p>
+            <p class="text-sm text-gray-500">Total Users</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Users -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-purple-100 rounded-lg">
+            <i class="pi pi-id-card text-xl text-purple-600"></i>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900">{{ staffUsers() }}</p>
+            <p class="text-sm text-gray-500">Staff Members</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Users -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-green-100 rounded-lg">
+            <i class="pi pi-check-circle text-xl text-green-600"></i>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900">{{ activeUsers() }}</p>
+            <p class="text-sm text-gray-500">Active</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suspended Users -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-red-100 rounded-lg">
+            <i class="pi pi-ban text-xl text-red-600"></i>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900">{{ suspendedUsers() }}</p>
+            <p class="text-sm text-gray-500">Suspended</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+      <div class="flex flex-col lg:flex-row gap-4">
+        <!-- Search -->
+        <div class="flex-1">
+          <div class="relative">
+            <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input
+              type="text"
+              [value]="searchQuery()"
+              (input)="searchQuery.set($any($event.target).value)"
+              placeholder="Search by name, email, or ID..."
+              class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
+        <!-- Role Filter -->
+        <div class="w-full lg:w-48">
+          <select
+            [value]="selectedRoleFilter()"
+            (change)="selectedRoleFilter.set($any($event.target).value)"
+            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+            <option value="ALL">All Roles</option>
+            @for (role of allRoles; track role.value) {
+              <option [value]="role.value">{{ role.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="w-full lg:w-40">
+          <select
+            [value]="selectedStatusFilter()"
+            (change)="selectedStatusFilter.set($any($event.target).value)"
+            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="SUSPENDED">Suspended</option>
+          </select>
+        </div>
+
+        <!-- Refresh -->
+        <button
+          (click)="loadUsers()"
+          [disabled]="isLoading()"
+          class="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50">
+          <i class="pi" [ngClass]="isLoading() ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-20">
+          <i class="pi pi-spin pi-spinner text-4xl text-indigo-600"></i>
+        </div>
+      } @else if (errorMessage()) {
+        <div class="text-center py-20">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+            <i class="pi pi-exclamation-triangle text-3xl text-red-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Failed to load users</h3>
+          <p class="text-gray-500 mb-4">{{ errorMessage() }}</p>
+          <button
+            (click)="loadUsers()"
+            class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+            Try Again
+          </button>
+        </div>
+      } @else if (filteredUsers().length === 0) {
+        <div class="text-center py-20">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <i class="pi pi-users text-3xl text-gray-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+          <p class="text-gray-500">
+            @if (searchQuery() || selectedRoleFilter() !== 'ALL' || selectedStatusFilter() !== 'ALL') {
+              Try adjusting your filters
+            } @else {
+              No users in the system yet
+            }
+          </p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @for (user of filteredUsers(); track user.id) {
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <!-- User Info -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-4">
+                      <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="pi" [ngClass]="getRoleIcon(user.role)" [class]="'text-indigo-600'"></i>
+                      </div>
+                      <div>
+                        <p class="font-medium text-gray-900">{{ user.name }}</p>
+                        <p class="text-sm text-gray-500">{{ user.email }}</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Role -->
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getRoleBadgeClass(user.role)">
+                      <i class="pi" [ngClass]="getRoleIcon(user.role)"></i>
+                      {{ getRoleLabel(user.role) }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusBadgeClass(user.active)">
+                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="user.active === false ? 'bg-red-500' : 'bg-green-500'"></span>
+                      {{ getStatusLabel(user.active) }}
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center justify-end gap-2">
+                      <!-- View Details -->
+                      <button
+                        (click)="viewUserDetails(user)"
+                        class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="View Details">
+                        <i class="pi pi-eye"></i>
+                      </button>
+
+                      <!-- Edit -->
+                      <button
+                        (click)="openEditModal(user)"
+                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit User">
+                        <i class="pi pi-pencil"></i>
+                      </button>
+
+                      <!-- Suspend/Activate -->
+                      @if (!isAdmin(user)) {
+                        <button
+                          (click)="toggleUserStatus(user)"
+                          class="p-2 rounded-lg transition-colors"
+                          [ngClass]="user.active === false ? 'text-green-600 hover:bg-green-50' : 'text-amber-600 hover:bg-amber-50'"
+                          [title]="user.active === false ? 'Activate' : 'Suspend'">
+                          <i class="pi" [ngClass]="user.active === false ? 'pi-check-circle' : 'pi-ban'"></i>
+                        </button>
+                      }
+
+                      <!-- Delete -->
+                      @if (!isAdmin(user)) {
+                        <button
+                          (click)="deleteUser(user)"
+                          class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete User">
+                          <i class="pi pi-trash"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Results Count -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <p class="text-sm text-gray-500">
+            Showing {{ filteredUsers().length }} of {{ totalUsers() }} users
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Create User Modal -->
+@if (showCreateModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCreateModal()"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-linear-to-r from-indigo-500 to-purple-600 px-6 py-5">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-lg">
+            <i class="pi pi-user-plus text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-white">Add Staff User</h2>
+            <p class="text-indigo-100 text-sm">Create a new staff account</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-5">
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+          <input
+            type="text"
+            [value]="newUser().name"
+            (input)="updateNewUser('name', $any($event.target).value)"
+            placeholder="Enter full name"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+          <input
+            type="email"
+            [value]="newUser().email"
+            (input)="updateNewUser('email', $any($event.target).value)"
+            placeholder="user@company.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+          <input
+            type="password"
+            [value]="newUser().password"
+            (input)="updateNewUser('password', $any($event.target).value)"
+            placeholder="Minimum 6 characters"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <!-- Role -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Role *</label>
+          <select
+            [value]="newUser().role"
+            (change)="updateNewUser('role', $any($event.target).value)"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+            @for (role of staffRoles; track role.value) {
+              <option [value]="role.value">{{ role.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Error -->
+        @if (formError()) {
+          <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p class="text-sm text-red-700 flex items-center gap-2">
+              <i class="pi pi-exclamation-circle"></i>
+              {{ formError() }}
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-4">
+        <button
+          (click)="closeCreateModal()"
+          [disabled]="isSubmitting()"
+          class="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50">
+          Cancel
+        </button>
+        <button
+          (click)="createUser()"
+          [disabled]="isSubmitting() || !isCreateFormValid()"
+          class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+          @if (isSubmitting()) {
+            <i class="pi pi-spin pi-spinner"></i>
+            Creating...
+          } @else {
+            <i class="pi pi-user-plus"></i>
+            Create User
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit User Modal -->
+@if (showEditModal() && selectedUser()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeEditModal()"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-linear-to-r from-blue-500 to-indigo-600 px-6 py-5">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-lg">
+            <i class="pi pi-user-edit text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-white">Edit User</h2>
+            <p class="text-blue-100 text-sm">{{ selectedUser()?.email }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-5">
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+          <input
+            type="text"
+            [value]="editForm().name"
+            (input)="updateEditForm('name', $any($event.target).value)"
+            placeholder="Enter full name"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+          <input
+            type="email"
+            [value]="editForm().email"
+            (input)="updateEditForm('email', $any($event.target).value)"
+            placeholder="user@company.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- New Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            New Password <span class="text-gray-400 font-normal">(leave blank to keep current)</span>
+          </label>
+          <input
+            type="password"
+            [value]="editForm().password || ''"
+            (input)="updateEditForm('password', $any($event.target).value)"
+            placeholder="Enter new password"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Role -->
+        @if (!isAdmin(selectedUser()!)) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+            <select
+              [value]="editForm().role"
+              (change)="updateEditForm('role', $any($event.target).value)"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+              @for (role of allRoles; track role.value) {
+                <option [value]="role.value">{{ role.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Error -->
+        @if (formError()) {
+          <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p class="text-sm text-red-700 flex items-center gap-2">
+              <i class="pi pi-exclamation-circle"></i>
+              {{ formError() }}
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-4">
+        <button
+          (click)="closeEditModal()"
+          [disabled]="isSubmitting()"
+          class="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50">
+          Cancel
+        </button>
+        <button
+          (click)="saveUserChanges()"
+          [disabled]="isSubmitting()"
+          class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+          @if (isSubmitting()) {
+            <i class="pi pi-spin pi-spinner"></i>
+            Saving...
+          } @else {
+            <i class="pi pi-check"></i>
+            Save Changes
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- User Details Modal -->
+@if (showDetailsModal() && selectedUser()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeDetailsModal()"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-linear-to-r from-gray-700 to-gray-900 px-6 py-5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+              <i class="pi text-2xl text-white" [ngClass]="getRoleIcon(selectedUser()!.role)"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold text-white">{{ selectedUser()?.name }}</h2>
+              <p class="text-gray-300 text-sm">{{ selectedUser()?.email }}</p>
+            </div>
+          </div>
+          <button 
+            (click)="closeDetailsModal()"
+            class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+            <i class="pi pi-times text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+        <!-- User ID -->
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-gray-500">User ID</span>
+          <span class="font-medium text-gray-900">#{{ selectedUser()?.id }}</span>
+        </div>
+
+        <!-- Role -->
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-gray-500">Role</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getRoleBadgeClass(selectedUser()!.role)">
+            <i class="pi" [ngClass]="getRoleIcon(selectedUser()!.role)"></i>
+            {{ getRoleLabel(selectedUser()!.role) }}
+          </span>
+        </div>
+
+        <!-- Status -->
+        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+          <span class="text-gray-500">Status</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusBadgeClass(selectedUser()!.active)">
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedUser()!.active === false ? 'bg-red-500' : 'bg-green-500'"></span>
+            {{ getStatusLabel(selectedUser()!.active) }}
+          </span>
+        </div>
+
+        <!-- Email -->
+        <div class="flex items-center justify-between py-3">
+          <span class="text-gray-500">Email</span>
+          <span class="font-medium text-gray-900">{{ selectedUser()?.email }}</span>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="flex gap-3">
+          <button
+            (click)="openEditModal(selectedUser()!); closeDetailsModal()"
+            class="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+            <i class="pi pi-pencil"></i>
+            Edit
+          </button>
+          
+          @if (!isAdmin(selectedUser()!)) {
+            <button
+              (click)="toggleUserStatus(selectedUser()!)"
+              class="flex-1 px-4 py-2.5 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+              [ngClass]="selectedUser()!.active === false 
+                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                : 'bg-amber-100 text-amber-700 hover:bg-amber-200'">
+              <i class="pi" [ngClass]="selectedUser()!.active === false ? 'pi-check-circle' : 'pi-ban'"></i>
+              {{ selectedUser()!.active === false ? 'Activate' : 'Suspend' }}
+            </button>
+
+            <button
+              (click)="deleteUser(selectedUser()!)"
+              class="px-4 py-2.5 bg-red-100 text-red-700 rounded-xl font-medium hover:bg-red-200 transition-colors flex items-center justify-center gap-2">
+              <i class="pi pi-trash"></i>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
