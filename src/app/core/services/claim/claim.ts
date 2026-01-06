@@ -51,7 +51,18 @@ export class Claim {
     return this.api.get<IClaim[]>(`${this.BASE_PATH}/officer/${officerId}/processed`);
   }
 
+  /**
+   * Get ALL claims in the system (for admin analytics)
+   * Backend endpoint: GET /claims/all or GET /claims
+   */
   getAllClaims(): Observable<IClaim[]> {
+    return this.api.get<IClaim[]>(`${this.BASE_PATH}`);
+  }
+
+  /**
+   * Get only open claims (SUBMITTED + IN_REVIEW)
+   */
+  getOpenClaimsOnly(): Observable<IClaim[]> {
     return this.getOpenClaims();
   }
 

@@ -24,6 +24,10 @@ export class Policy {
     return this.api.post<IPolicy>(`${this.BASE_PATH}/policies/enroll`, request);
   }
 
+  getAllPolicies(): Observable<IPolicy[]> {
+    return this.api.get<IPolicy[]>(`${this.BASE_PATH}/policies`);
+  }
+
   getMemberPolicies(userId: number): Observable<IPolicy[]> {
     return this.api.get<IPolicy[]>(`${this.BASE_PATH}/policies/member/${userId}`);
   }

@@ -29,16 +29,16 @@
            Home
         </a>
       </li>
-      <li>
-        <a routerLink="/public/hospitals" 
-           routerLinkActive="text-blue-600 font-semibold"
-           class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
-           Find Hospital
-        </a>
-      </li>
-
+      
       @if (user$ | async; as user) {
         <ng-container *appHasRole="['ROLE_USER']">
+          <li>
+            <a routerLink="/public/hospitals" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors font-medium text-sm">
+               Find Hospital
+            </a>
+          </li>
           <li>
             <a routerLink="/member/dashboard" 
                routerLinkActive="text-blue-600 font-semibold"

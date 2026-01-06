@@ -4,11 +4,12 @@ import { Router, RouterModule } from '@angular/router';
 import { PasswordForm } from '../../container/password-form/password-form';
 import { CommonModule } from '@angular/common';
 import { IChangePasswordRequest } from '../../../../core/models/user.model';
+import { Footer } from '../../../../shared/components/footer/footer';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [CommonModule, RouterModule, PasswordForm],
+  imports: [CommonModule, RouterModule, PasswordForm, Footer],
   templateUrl: './change-password.html',
   styleUrl: './change-password.css',
 })

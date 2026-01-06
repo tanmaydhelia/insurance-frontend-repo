@@ -33,14 +33,14 @@ export class Sidebar {
     { label: 'My Policies', icon: 'pi pi-file-check', route: '/member/policies' },
     { label: 'My Claims', icon: 'pi pi-file-edit', route: '/member/claims' },
     { label: 'My Documents', icon: 'pi pi-id-card', route: '/member/documents' },
-    { label: 'Raise Claim', icon: 'pi pi-plus-circle', route: '/public/search' },
+    // { label: 'Raise Claim', icon: 'pi pi-plus-circle', route: '/public/search' },
     { label: 'Analytics', icon: 'pi pi-chart-bar', route: '/member/analytics' },
-    { label: 'Profile', icon: 'pi pi-user', route: '/member/profile' },
+    // { label: 'Profile', icon: 'pi pi-user', route: '/member/profile' },
   ];
 
   adminMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/admin/dashboard' },
-    { label: 'Plans Management', icon: 'pi pi-briefcase', route: '/admin/dashboard' },
+    // { label: 'Plans Management', icon: 'pi pi-briefcase', route: '/admin/dashboard' },
     { label: 'Analytics', icon: 'pi pi-chart-line', route: '/admin/analytics' },
     { label: 'Users', icon: 'pi pi-users', route: '/admin/users' },
     { label: 'Reports', icon: 'pi pi-file-pdf', route: '/admin/reports' },
@@ -48,16 +48,16 @@ export class Sidebar {
 
   agentMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/agent/dashboard' },
-    { label: 'New Sale', icon: 'pi pi-shopping-cart', route: '/agent/sale/new' },
+    // { label: 'New Sale', icon: 'pi pi-shopping-cart', route: '/agent/sale/new' },
     { label: 'Analytics', icon: 'pi pi-chart-pie', route: '/agent/analytics' },
     { label: 'My Customers', icon: 'pi pi-users', route: '/agent/customers' },
-    { label: 'Commission', icon: 'pi pi-money-bill', route: '/agent/commission' },
+    // { label: 'Commission', icon: 'pi pi-money-bill', route: '/agent/commission' },
   ];
 
   providerMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/provider/dashboard' },
     { label: 'Submit Claim', icon: 'pi pi-upload', route: '/provider/submit-claim' },
-    { label: 'Analytics', icon: 'pi pi-chart-bar', route: '/provider/analytics' },
+    // { label: 'Analytics', icon: 'pi pi-chart-bar', route: '/provider/analytics' },
     { label: 'Claim History', icon: 'pi pi-history', route: '/provider/claims' },
     { label: 'Patients', icon: 'pi pi-users', route: '/provider/patients' },
   ];

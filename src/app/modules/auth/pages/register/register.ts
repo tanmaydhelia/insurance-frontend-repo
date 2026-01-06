@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { ERole, IUser } from '../../../../core/models/user.model';
 import { CommonModule } from '@angular/common';
 import { RegitserForm } from '../../container/regitser-form/regitser-form';
+import { Footer } from '../../../../shared/components/footer/footer';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, RegitserForm],
+  imports: [CommonModule, RegitserForm, Footer],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })

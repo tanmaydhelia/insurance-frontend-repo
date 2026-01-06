@@ -1,1 +1,22 @@
 /* Admin Analytics Styles */
+
+/* PrimeNG Chart styling */
+:host ::ng-deep .p-chart {
+  height: 100%;
+  width: 100%;
+}
+
+:host ::ng-deep .p-chart canvas {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+/* Chart card hover effects */
+.chart-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
