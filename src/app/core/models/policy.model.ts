@@ -22,7 +22,9 @@ export interface IPolicy {
   userId: number;
   agentId?: number; 
   plan?: IInsurancePlan;
-  insurancePlan?: IInsurancePlan; 
+  insurancePlan?: IInsurancePlan;
+  remainingSumInsured?: number;  // Remaining coverage after claims
+  coverageAmount?: number;       // Total coverage amount from plan
 }
 
 export interface IPlanRequest {

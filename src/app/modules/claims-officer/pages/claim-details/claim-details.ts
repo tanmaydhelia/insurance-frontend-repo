@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe, Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Claim } from '../../../../core/services/claim/claim';
 import { Policy } from '../../../../core/services/policy/policy';
@@ -25,6 +25,13 @@ export class ClaimDetails {
   private claimService = inject(Claim);
   private policyService = inject(Policy);
   private hospitalService = inject(Hospital);
+
+  // Approval modal state
+  showApprovalModal = signal(false);
+  approvedAmount = signal<number>(0);
+  approvalComments = signal<string>('');
+  approvalError = signal<string | null>(null);
+  isProcessing = signal(false);
 
   // 1. Fetch Claim
   claim = toSignal(
@@ -62,25 +69,84 @@ export class ClaimDetails {
     this.router.navigate(['/claims/dashboard']);
   }
 
+  openApprovalModal() {
+    const claim = this.claim();
+    if (!claim) return;
+    
+    // Pre-fill with claim amount (full approval by default)
+    this.approvedAmount.set(claim.claimAmount);
+    this.approvalComments.set('');
+    this.approvalError.set(null);
+    this.showApprovalModal.set(true);
+  }
+
+  closeApprovalModal() {
+    this.showApprovalModal.set(false);
+    this.approvalComments.set('');
+    this.approvalError.set(null);
+  }
+
+  validateApprovalAmount(): boolean {
+    const claim = this.claim();
+    const policy = this.policy();
+    const amount = this.approvedAmount();
+
+    if (!claim || !policy) {
+      this.approvalError.set('Unable to validate. Please try again.');
+      return false;
+    }
+
+    if (amount <= 0) {
+      this.approvalError.set('Approved amount must be greater than 0');
+      return false;
+    }
+
+    if (amount > claim.claimAmount) {
+      this.approvalError.set(`Approved amount cannot exceed claim amount (₹${claim.claimAmount.toLocaleString()})`);
+      return false;
+    }
+
+    const remainingSumInsured = policy.remainingSumInsured ?? policy.plan?.coverageAmount ?? 0;
+    if (amount > remainingSumInsured) {
+      this.approvalError.set(`Approved amount cannot exceed remaining sum insured (₹${remainingSumInsured.toLocaleString()})`);
+      return false;
+    }
+
+    this.approvalError.set(null);
+    return true;
+  }
+
   handleApprove() {
+    if (!this.validateApprovalAmount()) return;
+
     const id = this.claim()?.id;
     if (!id) return;
+
+    this.isProcessing.set(true);
     
-    this.dialogService.confirm({
-      title: 'Approve Claim',
-      message: 'Are you sure you want to approve this claim?',
-      type: 'success',
-      confirmText: 'Approve',
-      cancelText: 'Cancel'
-    }).subscribe(confirmed => {
-      if (!confirmed) return;
-      
-      this.claimService.updateClaimStatus(id, { status: ClaimStatus.APPROVED })
-        .subscribe(() => {
-          this.dialogService.success('Claim Approved').subscribe(() => {
-            this.goBack();
-          });
+    const updatePayload: any = { 
+      status: ClaimStatus.APPROVED,
+      approvedAmount: this.approvedAmount()
+    };
+    
+    // Include comments if provided
+    if (this.approvalComments().trim()) {
+      updatePayload.approvalComments = this.approvalComments().trim();
+    }
+    
+    this.claimService.updateClaimStatus(id, updatePayload).subscribe({
+      next: () => {
+        this.isProcessing.set(false);
+        this.closeApprovalModal();
+        this.dialogService.success(`Claim approved for ₹${this.approvedAmount().toLocaleString()}`).subscribe(() => {
+          this.goBack();
         });
+      },
+      error: (err) => {
+        this.isProcessing.set(false);
+        const message = err.error?.message || 'Failed to approve claim';
+        this.approvalError.set(message);
+      }
     });
   }
 

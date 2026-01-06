@@ -24,7 +24,13 @@
           scope="col"
           class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >
-          Amount
+          Claim Amount
+        </th>
+        <th
+          scope="col"
+          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          Approved Amount
         </th>
         <th
           scope="col"
@@ -61,6 +67,20 @@
         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
           {{ claim.claimAmount | currency : 'INR' : 'symbol' : '1.0-0' }}
         </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          @if (claim.status === 'APPROVED' && claim.approvedAmount) {
+            <span class="font-semibold text-green-600">
+              {{ claim.approvedAmount | currency : 'INR' : 'symbol' : '1.0-0' }}
+            </span>
+            @if (claim.approvedAmount === claim.claimAmount) {
+              <span class="ml-1 px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded">Full</span>
+            } @else {
+              <span class="ml-1 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded">Partial</span>
+            }
+          } @else {
+            <span class="text-gray-400">—</span>
+          }
+        </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           {{ claim.date || 'Today' }}
         </td>
@@ -79,11 +99,19 @@
             {{ claim.rejectionReason }}
           </p>
           }
+          @if (claim.status === 'APPROVED' && claim.approvalComments) {
+          <p
+            class="text-xs text-green-600 mt-1 truncate max-w-37.5"
+            title="{{ claim.approvalComments }}"
+          >
+            <i class="pi pi-comment text-xs mr-1"></i>{{ claim.approvalComments }}
+          </p>
+          }
         </td>
       </tr>
       } @empty {
       <tr>
-        <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500">
           <div class="flex flex-col items-center gap-2">
             <i class="pi pi-file-o text-2xl text-gray-400"></i>
             <p>You haven't raised any claims yet.</p>

@@ -1,11 +1,11 @@
-import { CommonModule, CurrencyPipe, DatePipe, NgClass } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IPolicy, PolicyStatus } from '../../../../core/models/policy.model';
 
 @Component({
   selector: 'app-policy-card',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DatePipe, NgClass],
+  imports: [CommonModule, CurrencyPipe, DatePipe, DecimalPipe, NgClass],
   templateUrl: './policy-card.html',
   styleUrl: './policy-card.css',
 })
@@ -23,5 +23,12 @@ export class PolicyCard {
       case PolicyStatus.CANCELLED: return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  getRemainingPercentage(): number {
+    const coverage = this.policy.plan?.coverageAmount || this.policy.insurancePlan?.coverageAmount || 0;
+    const remaining = this.policy.remainingSumInsured ?? coverage;
+    if (coverage === 0) return 100;
+    return (remaining / coverage) * 100;
   }
 }

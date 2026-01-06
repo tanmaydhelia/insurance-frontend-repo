@@ -1,32 +1,30 @@
-<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      
-      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <i class="pi pi-shield mx-auto h-10 w-auto text-4xl text-indigo-600 text-center block"></i>
-        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Sign in to your account
-        </h2>
-      </div>
 
-      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        
-        <div *ngIf="errorMessage" class="mb-4 rounded-md bg-red-50 p-4">
-          <div class="flex">
-            <div class="shrink-0">
-              <i class="pi pi-times-circle text-red-400"></i>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">Login Failed</h3>
-              <div class="mt-2 text-sm text-red-700">
-                <p>{{ errorMessage }}</p>
-              </div>
+<div class="flex min-h-full flex-col ">
+  <div class="justify-center px-6 py-12 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <i class="pi pi-shield mx-auto h-10 w-auto text-4xl text-indigo-600 text-center block"></i>
+      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        Sign in to your account
+      </h2>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div *ngIf="errorMessage" class="mb-4 rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="shrink-0">
+            <i class="pi pi-times-circle text-red-400"></i>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Login Failed</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p>{{ errorMessage }}</p>
             </div>
           </div>
         </div>
-
-        <app-login-form 
-          [isLoading]="isLoading" 
-          (onSubmit)="handleLogin($event)">
-        </app-login-form>
-
       </div>
+
+      <app-login-form [isLoading]="isLoading" (onSubmit)="handleLogin($event)"> </app-login-form>
     </div>
+  </div>
+  <app-footer></app-footer>
+</div>

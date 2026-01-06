@@ -16,6 +16,8 @@ export interface IClaim {
   hospitalId?: number; 
   diagnosis: string;
   claimAmount: number;
+  approvedAmount?: number;  // Amount approved by claims officer (may be less than claimed)
+  approvalComments?: string; // Optional comments from claims officer during approval
   status: ClaimStatus;
   submissionSource: SubmissionSource;
   rejectionReason?: string;
@@ -39,4 +41,6 @@ export interface IClaimRequest {
 export interface IClaimStatusUpdate {
   status: ClaimStatus;
   rejectionReason?: string;
+  approvedAmount?: number;  // Required when status is APPROVED
+  approvalComments?: string; // Optional comments during approval
 }

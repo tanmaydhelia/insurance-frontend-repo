@@ -30,6 +30,32 @@
           </div>
         </div>
 
+        @if (policy.remainingSumInsured !== undefined && policy.remainingSumInsured !== null) {
+        <div class="pt-2 border-t border-gray-100">
+          <div class="flex justify-between items-center mb-1">
+            <p class="text-xs font-medium text-gray-500 uppercase">Remaining Coverage</p>
+            <p class="text-sm font-semibold" [ngClass]="{
+              'text-green-600': getRemainingPercentage() >= 75,
+              'text-yellow-600': getRemainingPercentage() >= 25 && getRemainingPercentage() < 75,
+              'text-red-600': getRemainingPercentage() < 25
+            }">
+              {{ policy.remainingSumInsured | currency:'INR':'symbol':'1.0-0' }}
+            </p>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="h-2 rounded-full transition-all" 
+                 [style.width.%]="getRemainingPercentage()"
+                 [ngClass]="{
+                   'bg-green-500': getRemainingPercentage() >= 75,
+                   'bg-yellow-500': getRemainingPercentage() >= 25 && getRemainingPercentage() < 75,
+                   'bg-red-500': getRemainingPercentage() < 25
+                 }">
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">{{ getRemainingPercentage() | number:'1.0-0' }}% of coverage remaining</p>
+        </div>
+        }
+
         <div class="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
           <div>
             <p class="text-xs text-gray-500">Start Date</p>

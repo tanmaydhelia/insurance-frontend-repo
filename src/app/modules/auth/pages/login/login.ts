@@ -5,11 +5,12 @@ import { ERole, IAuthRequest } from '../../../../core/models/user.model';
 import { CommonModule } from '@angular/common';
 import { LoginForm } from '../../container/login-form/login-form';
 import { take } from 'rxjs';
+import { Footer } from '../../../../shared/components/footer/footer';
 
 @Component({
   selector: 'app-login',
   standalone:true,
-  imports:[CommonModule, LoginForm],
+  imports:[CommonModule, LoginForm, Footer],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
