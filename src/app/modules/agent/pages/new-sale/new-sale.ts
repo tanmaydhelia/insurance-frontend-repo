@@ -9,12 +9,13 @@ import { IInsurancePlan, IPolicyEnrollmentRequest } from '../../../../core/model
 import { Dialog } from '../../../../core/services/dialog/dialog';
 import { MemberDocument } from '../../../../core/services/member-document/member-document';
 import { DocumentUpload } from '../../../../shared/components/document-upload/document-upload';
-import { IUser } from '../../../../core/models/user.model';
+import { ERole, IUser } from '../../../../core/models/user.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-new-sale',
   standalone:true,
-  imports: [CommonModule, RouterModule, AgentPlanTable, DocumentUpload],
+  imports: [CommonModule, RouterModule, AgentPlanTable, DocumentUpload, FormsModule],
   templateUrl: './new-sale.html',
   styleUrl: './new-sale.css',
 })
@@ -33,6 +34,16 @@ export class NewSale {
   showDocumentUpload = signal(false);
   pendingCustomer = signal<IUser | null>(null);
   pendingPlan = signal<IInsurancePlan | null>(null);
+
+  // Registration modal state
+  showRegistrationModal = signal(false);
+  isRegistering = signal(false);
+  registrationError = signal<string | null>(null);
+  newCustomer = signal<{name: string; email: string; password: string}>({
+    name: '',
+    email: '',
+    password: ''
+  });
 
   // Load plans immediately
   plans = toSignal(this.policyService.getAllPlans());
@@ -57,7 +68,8 @@ export class NewSale {
     this.auth.getUserByEmail(email).subscribe({
       next: (user) => {
         if (!user?.id) {
-          this.errorMessage.set('Customer not found. Please check the email.');
+          // Customer not found - show registration modal
+          this.openRegistrationModal(email, plan);
           return;
         }
 
@@ -83,8 +95,98 @@ export class NewSale {
         });
       },
       error: () => {
-        this.errorMessage.set('Customer not found with this email.');
+        // Customer not found - show registration modal
+        this.openRegistrationModal(email, plan);
       },
+    });
+  }
+
+  // Registration Modal Methods
+  openRegistrationModal(email: string, plan: IInsurancePlan) {
+    this.newCustomer.set({ name: '', email: email, password: '' });
+    this.pendingPlan.set(plan);
+    this.registrationError.set(null);
+    this.showRegistrationModal.set(true);
+  }
+
+  closeRegistrationModal() {
+    this.showRegistrationModal.set(false);
+    this.registrationError.set(null);
+    this.pendingPlan.set(null);
+  }
+
+  updateNewCustomer(field: 'name' | 'email' | 'password', value: string) {
+    this.newCustomer.update(current => ({ ...current, [field]: value }));
+    this.registrationError.set(null);
+  }
+
+  isRegistrationValid(): boolean {
+    const customer = this.newCustomer();
+    return !!(
+      customer.name.trim().length >= 2 &&
+      customer.email.trim() &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) &&
+      customer.password.length >= 6
+    );
+  }
+
+  registerCustomer() {
+    if (!this.isRegistrationValid()) {
+      this.registrationError.set('Please fill all fields correctly.');
+      return;
+    }
+
+    const customer = this.newCustomer();
+    const plan = this.pendingPlan();
+    const agentId = this.auth.getUserId();
+
+    if (!plan || !agentId) {
+      this.registrationError.set('Unable to proceed. Please try again.');
+      return;
+    }
+
+    this.isRegistering.set(true);
+    this.registrationError.set(null);
+
+    const newUser: IUser = {
+      name: customer.name.trim(),
+      email: customer.email.trim(),
+      password: customer.password,
+      role: ERole.ROLE_USER
+    };
+
+    this.auth.register(newUser).subscribe({
+      next: () => {
+        this.isRegistering.set(false);
+        this.showRegistrationModal.set(false);
+        
+        // Update the customer email field
+        this.customerEmail.set(customer.email);
+        
+        // Get the newly registered user and proceed
+        this.auth.getUserByEmail(customer.email).subscribe({
+          next: (registeredUser) => {
+            if (registeredUser?.id) {
+              // Show document upload modal for the new user
+              this.pendingCustomer.set(registeredUser);
+              this.pendingPlan.set(plan);
+              this.showDocumentUpload.set(true);
+              
+              this.dialogService.success('Customer registered successfully! Please upload verification documents.');
+            } else {
+              this.errorMessage.set('Registration successful. Please try selecting the plan again.');
+            }
+          },
+          error: () => {
+            this.errorMessage.set('Registration successful. Please try selecting the plan again.');
+          }
+        });
+      },
+      error: (err) => {
+        this.isRegistering.set(false);
+        const message = err.error?.message || err.error || 'Registration failed. Email may already exist.';
+        this.registrationError.set(message);
+      }
     });
   }
 
