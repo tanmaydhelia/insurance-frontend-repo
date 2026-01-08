@@ -11,17 +11,17 @@
     
     <!-- Main Content Wrapper -->
     <div class="flex-1 flex flex-col min-w-0 overflow-auto">
-      <div>
-        <app-header (click)="toggleSidebar()"></app-header>
-        
-        <main class="flex-1 bg-gray-50 w-full overflow-y-auto overflow-auto">
-          <div class="max-w-7xl mx-auto w-full p-6">
-            <router-outlet></router-outlet>
-          </div>
-        </main>
-          
-      </div>
-
+      <!-- Header -->
+      <app-header (click)="toggleSidebar()"></app-header>
+      
+      <!-- Main Content - flex-1 ensures it takes remaining space -->
+      <main class="flex-1 bg-gray-50 w-full">
+        <div class="max-w-7xl mx-auto w-full p-6">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+      
+      <!-- Footer - stays at bottom -->
       <app-footer></app-footer>
     </div>
   </div>
