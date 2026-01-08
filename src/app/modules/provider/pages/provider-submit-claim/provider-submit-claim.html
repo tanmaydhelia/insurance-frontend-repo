@@ -5,14 +5,47 @@
 
       @if (hospitalId()) {
         <app-policy-finder (onSearch)="verifyPolicy($event)"></app-policy-finder>
+
+        <!-- Verification Error -->
+        @if (verificationError()) {
+          <div class="mt-4 bg-red-50 p-4 rounded-md border border-red-200">
+            <p class="text-sm text-red-800">
+              <i class="pi pi-exclamation-circle mr-2"></i>
+              {{ verificationError() }}
+            </p>
+          </div>
+        }
       }
 
       @if (verifiedPolicy(); as policy) {
         <div class="mt-8 bg-green-50 p-4 rounded-md border border-green-200 mb-8">
-           <p class="text-sm text-green-800 font-semibold">
-             <i class="pi pi-check-circle mr-2"></i>
-             Verified: {{ policy.plan?.name }}
-           </p>
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-green-800 font-semibold">
+                <i class="pi pi-check-circle mr-2"></i>
+                Policy Verified Successfully
+              </p>
+              <div class="mt-2 text-sm text-green-700 space-y-1">
+                <p><strong>Policy Number:</strong> {{ policy.policyNumber }}</p>
+                <p><strong>Plan:</strong> {{ policy.plan?.name || policy.insurancePlan?.name }}</p>
+                <p><strong>Member:</strong> {{ policy.userName || 'N/A' }}</p>
+                <p><strong>Status:</strong> 
+                  <span [class]="policy.status === 'ACTIVE' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'">
+                    {{ policy.status }}
+                  </span>
+                </p>
+                @if (policy.daysRemaining !== undefined) {
+                  <p><strong>Days Remaining:</strong> {{ policy.daysRemaining }} days</p>
+                }
+                <p><strong>Remaining Coverage:</strong> {{ policy.remainingSumInsured | currency:'INR':'symbol':'1.0-0' }}</p>
+              </div>
+            </div>
+            @if (policy.renewable) {
+              <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
+                Renewal Available
+              </span>
+            }
+          </div>
         </div>
 
         <div class="bg-white shadow rounded-lg px-6 py-6 border border-gray-200">

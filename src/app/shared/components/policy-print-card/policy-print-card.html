@@ -1,0 +1,200 @@
+@if (isOpen) {
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 print:hidden" (click)="close()">
+    <!-- Modal -->
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-900">Policy Card</h2>
+        <div class="flex gap-2">
+          <button (click)="print()" 
+                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+            <i class="pi pi-print mr-2"></i>
+            Print
+          </button>
+          <button (click)="close()" class="text-gray-400 hover:text-gray-600 p-1">
+            <i class="pi pi-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Card -->
+      <div class="p-6" id="policy-print-area">
+        <div class="policy-card border-2 border-gray-200 rounded-xl overflow-hidden bg-linear-to-br from-blue-50 to-indigo-50">
+          <!-- Card Header with Logo -->
+          <div class="bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <i class="pi pi-shield text-xl"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold">Health Insurance</h3>
+                  <p class="text-blue-100 text-sm">Policy Card</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold" 
+                      [class]="policy.status === PolicyStatus.ACTIVE ? 'bg-green-400 text-green-900' : 
+                               policy.status === PolicyStatus.EXPIRED ? 'bg-gray-300 text-gray-700' : 
+                               'bg-red-400 text-red-900'">
+                  {{ policy.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member Info -->
+          <div class="px-6 py-4 border-b border-gray-200 bg-white">
+            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Member Name</p>
+            <p class="text-xl font-bold text-gray-900">{{ user.name }}</p>
+            <p class="text-sm text-gray-600 mt-1">
+              <i class="pi pi-envelope mr-1"></i>
+              {{ user.email }}
+            </p>
+          </div>
+
+          <!-- Policy Details -->
+          <div class="px-6 py-4 bg-white">
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Policy Number -->
+              <div class="col-span-2">
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Policy Number</p>
+                <p class="text-lg font-mono font-bold text-indigo-600">{{ policy.policyNumber }}</p>
+              </div>
+
+              <!-- Plan Name -->
+              <div class="col-span-2">
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Plan</p>
+                <p class="text-base font-semibold text-gray-900">{{ policy.plan?.name || policy.insurancePlan?.name || 'N/A' }}</p>
+              </div>
+
+              <!-- Coverage -->
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Coverage Amount</p>
+                <p class="text-base font-semibold text-gray-900">
+                  {{ (policy.plan?.coverageAmount || policy.insurancePlan?.coverageAmount || 0) | currency:'INR':'symbol':'1.0-0' }}
+                </p>
+              </div>
+
+              <!-- Premium -->
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Annual Premium</p>
+                <p class="text-base font-semibold text-blue-600">
+                  {{ policy.premium | currency:'INR':'symbol':'1.0-0' }}
+                </p>
+              </div>
+
+              <!-- Valid From -->
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Valid From</p>
+                <p class="text-sm font-medium text-gray-700">{{ policy.startDate | date:'mediumDate' }}</p>
+              </div>
+
+              <!-- Valid Until -->
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Valid Until</p>
+                <p class="text-sm font-medium" [class]="policy.daysRemaining && policy.daysRemaining <= 30 ? 'text-orange-600' : 'text-gray-700'">
+                  {{ policy.endDate | date:'mediumDate' }}
+                </p>
+              </div>
+
+              <!-- Days Remaining -->
+              @if (policy.daysRemaining !== undefined && policy.status === PolicyStatus.ACTIVE) {
+                <div class="col-span-2 mt-2">
+                  <div class="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2">
+                    <span class="text-sm text-gray-600">Days Remaining</span>
+                    <span class="text-lg font-bold" [class]="policy.daysRemaining <= 30 ? 'text-orange-600' : 'text-green-600'">
+                      {{ policy.daysRemaining }} days
+                    </span>
+                  </div>
+                </div>
+              }
+
+              <!-- Remaining Coverage -->
+              @if (policy.remainingSumInsured !== undefined) {
+                <div class="col-span-2">
+                  <div class="flex items-center justify-between bg-blue-50 rounded-lg px-4 py-2">
+                    <span class="text-sm text-blue-700">Remaining Coverage</span>
+                    <span class="text-lg font-bold text-blue-600">
+                      {{ policy.remainingSumInsured | currency:'INR':'symbol':'1.0-0' }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-3 bg-gray-100 border-t border-gray-200">
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <span>Generated on {{ today | date:'medium' }}</span>
+              <span>ID: {{ policy.id }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions (hidden in print) -->
+        <div class="mt-4 text-center text-sm text-gray-500 print:hidden">
+          <p>Keep this card for hospital admissions and claims.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print-only content -->
+  <div class="hidden print:block print:p-8">
+    <div class="policy-card border-2 border-gray-300 rounded-xl overflow-hidden max-w-md mx-auto">
+      <!-- Header -->
+      <div class="bg-gray-800 px-6 py-4 text-white text-center">
+        <h3 class="text-xl font-bold">Health Insurance Policy Card</h3>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 space-y-4">
+        <div class="text-center border-b pb-4">
+          <p class="text-2xl font-bold">{{ user.name }}</p>
+          <p class="text-gray-600">{{ user.email }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="col-span-2">
+            <p class="text-gray-500">Policy Number</p>
+            <p class="text-lg font-mono font-bold">{{ policy.policyNumber }}</p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-gray-500">Plan</p>
+            <p class="font-semibold">{{ policy.plan?.name || policy.insurancePlan?.name }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Coverage</p>
+            <p class="font-semibold">{{ (policy.plan?.coverageAmount || policy.insurancePlan?.coverageAmount || 0) | currency:'INR':'symbol':'1.0-0' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Premium</p>
+            <p class="font-semibold">{{ policy.premium | currency:'INR':'symbol':'1.0-0' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Valid From</p>
+            <p class="font-semibold">{{ policy.startDate | date:'mediumDate' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Valid Until</p>
+            <p class="font-semibold">{{ policy.endDate | date:'mediumDate' }}</p>
+          </div>
+          <div class="col-span-2 text-center pt-2 border-t">
+            <span class="px-4 py-1 rounded-full text-sm font-semibold" 
+                  [class]="getStatusBgColor() + ' ' + getStatusColor()">
+              Status: {{ policy.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-2 bg-gray-100 text-center text-xs text-gray-500">
+        Generated: {{ today | date:'medium' }} | Policy ID: {{ policy.id }}
+      </div>
+    </div>
+  </div>
+}

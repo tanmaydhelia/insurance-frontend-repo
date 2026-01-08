@@ -27,12 +27,27 @@ export class ProviderSubmitClaim {
   hospitalId = signal<number | null>(null);
   verifiedPolicy = signal<IPolicy | null>(null);
   isSubmitting = false;
+  verificationError = signal<string | null>(null);
 
-  verifyPolicy(policyNum: string) {
-    const id = Number(policyNum);
-    if (!isNaN(id)) {
-      this.policyService.getPolicyById(id).subscribe((p) => this.verifiedPolicy.set(p));
+  verifyPolicy(policyNumber: string) {
+    if (!policyNumber.trim()) {
+      this.verificationError.set('Please enter a policy number');
+      return;
     }
+
+    this.verificationError.set(null);
+    this.verifiedPolicy.set(null);
+
+    this.policyService.getPolicyByNumber(policyNumber.trim()).subscribe({
+      next: (policy) => {
+        this.verifiedPolicy.set(policy);
+        this.verificationError.set(null);
+      },
+      error: (err) => {
+        this.verifiedPolicy.set(null);
+        this.verificationError.set(err.error?.message || 'Policy not found');
+      }
+    });
   }
 
   setHospital(id: any) {

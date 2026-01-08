@@ -1,48 +1,119 @@
-  <div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Error Alert -->
+    @if (reminderError()) {
+      <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-exclamation-circle text-red-600 text-xl"></i>
+          <span class="text-red-700">{{ reminderError() }}</span>
+        </div>
+        <button (click)="closeReminderError()" class="text-red-600 hover:text-red-800">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    }
+
     <div class="md:flex md:items-center md:justify-between mb-8">
       <div class="min-w-0 flex-1">
-        <h2
-          class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
-        >
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
           Agent Portal
         </h2>
       </div>
       <div class="mt-4 flex md:ml-4 md:mt-0 gap-3">
-        <a
-          routerLink="/agent/customers"
-          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all"
-        >
+        <a routerLink="/agent/customers"
+          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all">
           <i class="pi pi-users mr-2"></i>
           My Customers
         </a>
-        <a
-          routerLink="/agent/analytics"
-          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all"
-        >
+        <a routerLink="/agent/analytics"
+          class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-all">
           <i class="pi pi-chart-bar mr-2"></i>
           Analytics
         </a>
-        <a
-          routerLink="/agent/sale/new"
-          class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"
-        >
+        <a routerLink="/agent/sale/new"
+          class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all">
           <i class="pi pi-plus mr-2"></i>
           Sell New Policy
         </a>
       </div>
     </div>
 
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Total Policies</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ totalPolicies() }}</p>
+          </div>
+          <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+            <i class="pi pi-file text-blue-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Active Policies</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">{{ activePolicies() }}</p>
+          </div>
+          <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Expiring Soon</p>
+            <p class="text-2xl font-bold text-orange-600 mt-1">{{ expiringCount() }}</p>
+          </div>
+          <div class="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
+            <i class="pi pi-clock text-orange-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Total Premium</p>
+            <p class="text-2xl font-bold text-indigo-600 mt-1">{{ totalPremium() | currency:'INR':'symbol':'1.0-0' }}</p>
+          </div>
+          <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+            <i class="pi pi-wallet text-indigo-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl overflow-hidden">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-100 bg-gray-50/50">
+      <!-- Tabs -->
+      <div class="px-4 py-4 sm:px-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+        <div class="flex gap-4">
+          <button 
+            (click)="setActiveTab('all')"
+            [class]="activeTab() === 'all' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-2 font-semibold' : 'text-gray-500 pb-2 hover:text-gray-700'"
+            class="text-sm">
+            All Policies ({{ totalPolicies() }})
+          </button>
+          <button 
+            (click)="setActiveTab('expiring')"
+            [class]="activeTab() === 'expiring' ? 'text-orange-600 border-b-2 border-orange-600 pb-2 font-semibold' : 'text-gray-500 pb-2 hover:text-gray-700'"
+            class="text-sm">
+            <i class="pi pi-exclamation-triangle mr-1"></i>
+            Expiring Soon ({{ expiringCount() }})
+          </button>
+        </div>
         <h3 class="text-base font-semibold leading-6 text-gray-900">My Sales Portfolio</h3>
       </div>
 
       <ul role="list" class="divide-y divide-gray-100">
-        @for (policy of policies(); track policy.id) {
-        <li
-          class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6 transition-colors"
-        >
+        @for (policy of displayedPolicies(); track policy.id) {
+        <li class="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6 transition-colors">
           <div class="flex min-w-0 gap-x-4">
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-gray-900">
@@ -51,30 +122,91 @@
               <p class="mt-1 flex text-xs leading-5 text-gray-500">
                 Policy #{{ policy.policyNumber }}
               </p>
+              @if (policy.userName) {
+                <p class="mt-1 text-xs text-gray-400">
+                  <i class="pi pi-user mr-1"></i>
+                  {{ policy.userName }} 
+                  @if (policy.userEmail) {
+                    <span class="text-gray-300 mx-1">|</span>
+                    {{ policy.userEmail }}
+                  }
+                </p>
+              }
             </div>
           </div>
-          <div class="flex flex-col items-end">
-            <p class="text-sm leading-6 text-gray-900 font-bold">
-              {{ policy.premium | currency : 'INR' : 'symbol' : '1.0-0' }}
-            </p>
-            <p class="mt-1 text-xs leading-5 text-gray-500">
-              Sold:
-              <time [attr.datetime]="policy.startDate">{{
-                policy.startDate | date : 'mediumDate'
-              }}</time>
-            </p>
-            <div class="mt-1 flex items-center gap-x-1.5">
-              <div class="flex-none rounded-full bg-emerald-500/20 p-1">
-                <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+          <div class="flex items-center gap-6">
+            <!-- Days Remaining Badge -->
+            @if (policy.daysRemaining !== undefined && policy.daysRemaining <= 30) {
+              <div class="text-center">
+                <p class="text-xs text-gray-500">Days Left</p>
+                <p [class]="getDaysRemainingClass(policy.daysRemaining)" class="text-lg">
+                  {{ policy.daysRemaining }}
+                </p>
               </div>
-              <p class="text-xs leading-5 text-gray-500">{{ policy.status }}</p>
+            }
+
+            <div class="flex flex-col items-end">
+              <p class="text-sm leading-6 text-gray-900 font-bold">
+                {{ policy.premium | currency : 'INR' : 'symbol' : '1.0-0' }}
+              </p>
+              <p class="mt-1 text-xs leading-5 text-gray-500">
+                Sold:
+                <time [attr.datetime]="policy.startDate">{{
+                  policy.startDate | date : 'mediumDate'
+                }}</time>
+              </p>
+              <div class="mt-1 flex items-center gap-x-1.5">
+                <div class="flex-none rounded-full p-1" [ngClass]="{
+                  'bg-emerald-500/20': policy.status === PolicyStatus.ACTIVE,
+                  'bg-gray-500/20': policy.status === PolicyStatus.EXPIRED,
+                  'bg-red-500/20': policy.status === PolicyStatus.CANCELLED
+                }">
+                  <div class="h-1.5 w-1.5 rounded-full" [class]="getStatusColor(policy.status)"></div>
+                </div>
+                <p class="text-xs leading-5 text-gray-500">{{ policy.status }}</p>
+              </div>
             </div>
+
+            <!-- Renewal Reminder Button -->
+            @if (activeTab() === 'expiring' || (policy.daysRemaining !== undefined && policy.daysRemaining <= 30)) {
+              <div class="flex flex-col items-center">
+                @if (isReminderSent(policy.id)) {
+                  <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-700 bg-green-100 rounded-md">
+                    <i class="pi pi-check mr-1"></i>
+                    Reminder Sent
+                  </span>
+                } @else if (policy.renewalRequestedAt) {
+                  <span class="text-xs text-blue-600">
+                    <i class="pi pi-info-circle mr-1"></i>
+                    Sent {{ policy.renewalRequestedAt | date:'shortDate' }}
+                  </span>
+                } @else {
+                  <button 
+                    (click)="sendRenewalReminder(policy)"
+                    [disabled]="isSendingReminder(policy.id)"
+                    class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    @if (isSendingReminder(policy.id)) {
+                      <i class="pi pi-spin pi-spinner mr-1"></i>
+                      Sending...
+                    } @else {
+                      <i class="pi pi-bell mr-1"></i>
+                      Send Reminder
+                    }
+                  </button>
+                }
+              </div>
+            }
           </div>
         </li>
         } @empty {
         <li class="px-4 py-12 text-center">
-          <i class="pi pi-briefcase text-gray-400 text-3xl mb-3"></i>
-          <p class="text-gray-500 text-sm">You haven't sold any policies yet.</p>
+          @if (activeTab() === 'expiring') {
+            <i class="pi pi-check-circle text-green-400 text-3xl mb-3"></i>
+            <p class="text-gray-500 text-sm">No policies expiring in the next 30 days!</p>
+          } @else {
+            <i class="pi pi-briefcase text-gray-400 text-3xl mb-3"></i>
+            <p class="text-gray-500 text-sm">You haven't sold any policies yet.</p>
+          }
         </li>
         }
       </ul>
