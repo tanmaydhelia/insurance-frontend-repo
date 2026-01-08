@@ -32,10 +32,10 @@
         <select 
           [ngModel]="selectedHospitalId()"
           (ngModelChange)="selectHospital($event)"
-          class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border px-3 py-2 text-sm">
-          <option [value]="0">-- Select a Hospital --</option>
+          class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border px-3 py-2 text-sm text-gray-500">
+          <option [value]="0" disabled selected>-- Select a Hospital --</option>
           @for (hospital of hospitals(); track hospital.id) {
-            <option [value]="hospital.id">{{ hospital.name }}</option>
+            <option [value]="hospital.id" class="text-gray-900">{{ hospital.name }}</option>
           }
         </select>
       </div>

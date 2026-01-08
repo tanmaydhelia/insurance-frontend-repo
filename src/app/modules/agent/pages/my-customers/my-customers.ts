@@ -5,14 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { Policy } from '../../../../core/services/policy/policy';
 import { Claim } from '../../../../core/services/claim/claim';
 import { Auth } from '../../../../core/services/auth/auth';
+import { MemberDocument } from '../../../../core/services/member-document/member-document';
 import { IPolicy } from '../../../../core/models/policy.model';
 import { IClaim, ClaimStatus } from '../../../../core/models/claim.model';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { forkJoin, of, switchMap, catchError, map } from 'rxjs';
 
 interface CustomerSummary {
   userId: number;
   userName?: string;
   userEmail?: string;
+  userPhotoUrl?: string;
   policies: IPolicy[];
   claims: IClaim[];
   totalPremium: number;
@@ -33,6 +35,7 @@ export class MyCustomers {
   private policyService = inject(Policy);
   private claimService = inject(Claim);
   private auth = inject(Auth);
+  private memberDocService = inject(MemberDocument);
 
   isLoading = signal(true);
   searchTerm = signal('');
@@ -59,6 +62,7 @@ export class MyCustomers {
           userId,
           userName: policy.userName,
           userEmail: policy.userEmail,
+          userPhotoUrl: (policy as any).userPhotoUrl,
           policies: [],
           claims: [],
           totalPremium: 0,
@@ -129,11 +133,69 @@ export class MyCustomers {
           policies: this.policyService.getAgentPolicies(user.id),
           claims: this.claimService.getAgentClaims(user.id)
         });
+      }),
+      switchMap(data => {
+        const policies = data.policies || [];
+        const claims = data.claims || [];
+        
+        // Extract unique user IDs
+        const userIds = [...new Set(policies.map(p => p.userId).filter(id => id))];
+        
+        if (userIds.length === 0) {
+          return of({ policies, claims, userInfos: [], userDocs: [], userIds: [] });
+        }
+        
+        // Fetch user basic info AND documents for each user in parallel
+        const userRequests = userIds.map(userId => 
+          forkJoin({
+            userInfo: this.auth.getUserBasicInfo(userId).pipe(
+              catchError(() => of(null))
+            ),
+            userDoc: this.memberDocService.getDocuments(userId).pipe(
+              catchError(() => of(null))
+            )
+          })
+        );
+        
+        return forkJoin(userRequests).pipe(
+          map(results => ({ policies, claims, results, userIds }))
+        );
       })
     ).subscribe({
       next: (data) => {
-        this.policies.set(data.policies || []);
-        this.claims.set(data.claims || []);
+        const policies = data.policies || [];
+        const claims = data.claims || [];
+        const results = 'results' in data ? data.results : [];
+        const userIds = 'userIds' in data ? data.userIds : [];
+        
+        // Create maps for user info and documents
+        const userInfoMap = new Map();
+        const userDocMap = new Map();
+        
+        results.forEach((result: any, index: number) => {
+          const userId = userIds[index];
+          if (result.userInfo) {
+            userInfoMap.set(userId, result.userInfo);
+          }
+          if (result.userDoc) {
+            userDocMap.set(userId, result.userDoc);
+          }
+        });
+        
+        // Enrich policies with user info and photos
+        const enrichedPolicies = policies.map(policy => {
+          const userInfo = userInfoMap.get(policy.userId);
+          const doc = userDocMap.get(policy.userId);
+          return {
+            ...policy,
+            userName: policy.userName || userInfo?.name,
+            userEmail: policy.userEmail || userInfo?.email,
+            userPhotoUrl: doc?.photoUrl
+          };
+        });
+        
+        this.policies.set(enrichedPolicies);
+        this.claims.set(claims);
         this.isLoading.set(false);
       },
       error: () => {

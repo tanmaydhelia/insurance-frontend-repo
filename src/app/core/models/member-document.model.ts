@@ -8,7 +8,7 @@ export interface IMemberDocumentRequest {
 export interface IMemberDocumentResponse {
   id: number;
   userId: number;
-  aadhaarNumber: string; // Masked: XXXX-XXXX-1234
+  aadhaarNumber: string;
   photoUrl: string;
   medicalCheckupDocUrl: string;
   createdAt: string;

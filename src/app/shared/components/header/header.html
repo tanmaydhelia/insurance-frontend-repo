@@ -92,13 +92,56 @@
 
     <div class="flex items-center gap-4">
       @if (user$ | async; as user) {
-        <span class="text-sm font-semibold text-gray-700 hidden sm:block">
-          Hi, {{ user.name }}
-        </span>
-        <button (click)="logout()" 
-                class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-100">
-          Logout
-        </button>
+        <!-- Profile Photo Dropdown -->
+        <div class="relative">
+          <button 
+            (click)="toggleDropdown()"
+            class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            @if (userPhotoUrl()) {
+              <img [src]="userPhotoUrl()" 
+                   [alt]="user.name"
+                   class="w-full h-full object-cover">
+            } @else {
+              <div class="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm">
+                {{ user.name.charAt(0).toUpperCase() || 'U' }}
+              </div>
+            }
+          </button>
+
+          <!-- Dropdown Menu -->
+          @if (isDropdownOpen()) {
+            <!-- Backdrop for mobile -->
+            <div 
+              (click)="closeDropdown()"
+              class="fixed inset-0 z-10 md:hidden">
+            </div>
+
+            <!-- Dropdown Content -->
+            <div class="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+              <!-- User Info -->
+              <div class="px-4 py-3 border-b border-gray-100">
+                <p class="text-sm font-semibold text-gray-900">{{ user.name }}</p>
+                <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="py-1">
+                <button
+                  (click)="navigateToChangePassword()"
+                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors">
+                  <i class="pi pi-lock text-gray-400"></i>
+                  <span>Change Password</span>
+                </button>
+                <button
+                  (click)="logout()"
+                  class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                  <i class="pi pi-sign-out text-red-500"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
       } @else {
         <a routerLink="/auth/login" 
            class="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">

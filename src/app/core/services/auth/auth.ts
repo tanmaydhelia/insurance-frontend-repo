@@ -68,6 +68,11 @@ export class Auth {
     return this.api.get<IUser>(`/auth/users/${email}`);
   }
 
+  // Get basic user info by ID (no authentication required)
+  getUserBasicInfo(userId: number): Observable<IUser> {
+    return this.api.get<IUser>(`/auth/user/${userId}/basic`);
+  }
+
   private loadUserFromToken() {
     const token = this.getToken();
     if (token) this.decodeAndSetUser(token);
