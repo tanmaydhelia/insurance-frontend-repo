@@ -114,7 +114,7 @@ export class Sidebar {
   logout() {
     this.auth.logout();
     this.closeSidebar();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['']);
   }
 
   navigate(route: string) {

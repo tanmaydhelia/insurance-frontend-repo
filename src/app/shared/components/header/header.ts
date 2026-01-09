@@ -62,7 +62,7 @@ export class Header {
   logout(): void {
     this.closeDropdown();
     this.auth.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['']);
   }
   
   onToggleSidebar(): void {

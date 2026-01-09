@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+
+// Password validation requirements
+interface PasswordRequirement {
+  label: string;
+  validator: (value: string) => boolean;
+  met: boolean;
+}
 
 @Component({
   selector: 'app-password-form',
@@ -15,11 +22,64 @@ export class PasswordForm {
   @Input() isLoading = false;
   @Output() update = new EventEmitter<any>();
 
+  // Password requirements checklist
+  passwordRequirements: PasswordRequirement[] = [
+    { label: 'At least 8 characters', validator: (v) => v.length >= 8, met: false },
+    { label: 'At least one uppercase letter (A-Z)', validator: (v) => /[A-Z]/.test(v), met: false },
+    { label: 'At least one lowercase letter (a-z)', validator: (v) => /[a-z]/.test(v), met: false },
+    { label: 'At least one number (0-9)', validator: (v) => /[0-9]/.test(v), met: false },
+    { label: 'At least one special character (!@#$%^&*)', validator: (v) => /[!@#$%^&*(),.?":{}|<>]/.test(v), met: false },
+  ];
+
+  showPasswordRequirements = signal(false);
+
   passwordForm: FormGroup = this.fb.group({
     oldPassword: ['', [Validators.required, Validators.minLength(4)]],
-    newPassword: ['', [Validators.required, Validators.minLength(6)]],
+    newPassword: ['', [Validators.required, this.strongPasswordValidator.bind(this)]],
     confirmPassword: ['', [Validators.required]]
   }, { validators: this.passwordMatchValidator });
+
+  constructor() {
+    // Update requirements on password change
+    this.passwordForm.get('newPassword')?.valueChanges.subscribe(value => {
+      this.updatePasswordRequirements(value || '');
+    });
+  }
+
+  private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value || '';
+    
+    const hasMinLength = value.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasLowerCase = /[a-z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+    const isStrong = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+
+    if (!isStrong) {
+      return { weakPassword: true };
+    }
+    return null;
+  }
+
+  private updatePasswordRequirements(value: string) {
+    this.passwordRequirements = this.passwordRequirements.map(req => ({
+      ...req,
+      met: req.validator(value)
+    }));
+  }
+
+  onPasswordFocus() {
+    this.showPasswordRequirements.set(true);
+  }
+
+  onPasswordBlur() {
+    const password = this.passwordForm.get('newPassword')?.value;
+    if (!password || this.passwordRequirements.every(r => r.met)) {
+      this.showPasswordRequirements.set(false);
+    }
+  }
 
   onSubmit() {
     if (this.passwordForm.valid) {
@@ -32,6 +92,7 @@ export class PasswordForm {
 
   reset() {
     this.passwordForm.reset();
+    this.updatePasswordRequirements('');
   }
 
   isInvalid(field: string): boolean {
@@ -52,6 +113,9 @@ export class PasswordForm {
     if (control?.hasError('minlength')) {
       const minLength = control.errors?.['minlength'].requiredLength;
       return `${this.getFieldLabel(field)} must be at least ${minLength} characters`;
+    }
+    if (control?.hasError('weakPassword')) {
+      return 'Password does not meet all requirements';
     }
     return '';
   }
